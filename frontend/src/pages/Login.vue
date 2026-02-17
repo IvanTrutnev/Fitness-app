@@ -48,6 +48,13 @@
             style="width: 100%"
           />
         </div>
+
+        <div class="text-center mt-3">
+          <span class="text-gray-600">Don't have an account? </span>
+          <router-link to="/register" class="text-blue-600 hover:underline">
+            Register here
+          </router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -111,10 +118,13 @@ const onLogin = async () => {
   max-width: 400px;
   background: white;
   border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .login-title {
   text-align: center;
   color: #3f51b5;
+  margin-bottom: 1.5rem;
 }
 </style>

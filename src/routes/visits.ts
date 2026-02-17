@@ -110,12 +110,14 @@ router.get('/my', authMiddleware, async (req: AuthRequest, res) => {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
-    const { limit = '50', skip = '0', trainerId } = req.query;
+    const { limit = '50', skip = '0', trainerId, dateFrom, dateTo } = req.query;
 
     const options = {
       limit: parseInt(limit as string),
       skip: parseInt(skip as string),
       trainerId: trainerId as string | undefined,
+      dateFrom: dateFrom ? new Date(dateFrom as string) : undefined,
+      dateTo: dateTo ? new Date(dateTo as string) : undefined,
     };
 
     const visits = await VisitService.getUserVisits(userId, options);
@@ -152,12 +154,14 @@ router.get('/user/:userId', authMiddleware, async (req: AuthRequest, res) => {
       });
     }
 
-    const { limit = '50', skip = '0', trainerId } = req.query;
+    const { limit = '50', skip = '0', trainerId, dateFrom, dateTo } = req.query;
 
     const options = {
       limit: parseInt(limit as string),
       skip: parseInt(skip as string),
       trainerId: trainerId as string | undefined,
+      dateFrom: dateFrom ? new Date(dateFrom as string) : undefined,
+      dateTo: dateTo ? new Date(dateTo as string) : undefined,
     };
 
     const visits = await VisitService.getUserVisits(userId, options);
@@ -195,12 +199,14 @@ router.get(
         });
       }
 
-      const { limit = '50', skip = '0', userId } = req.query;
+      const { limit = '50', skip = '0', userId, dateFrom, dateTo } = req.query;
 
       const options = {
         limit: parseInt(limit as string),
         skip: parseInt(skip as string),
         userId: userId as string | undefined,
+        dateFrom: dateFrom ? new Date(dateFrom as string) : undefined,
+        dateTo: dateTo ? new Date(dateTo as string) : undefined,
       };
 
       const visits = await VisitService.getTrainerVisits(trainerId, options);

@@ -1,5 +1,6 @@
 // src/services/authService.ts
 import { User } from '../models/User';
+import { UserRole } from '../constants/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -50,7 +51,7 @@ export class AuthService {
       email,
       password: hash,
       username: email,
-      role: 'USER',
+      role: UserRole.USER,
     });
 
     await user.save();

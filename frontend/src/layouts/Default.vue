@@ -37,6 +37,11 @@ const menuItems = computed(() => {
       command: () => router.push({ name: 'Profile' }),
     },
     {
+      label: 'Visits',
+      icon: 'pi pi-calendar',
+      command: () => router.push({ name: 'Visits' }),
+    },
+    {
       label: 'Settings',
       icon: 'pi pi-cog',
       command: () => router.push({ name: 'Settings' }),
@@ -44,7 +49,7 @@ const menuItems = computed(() => {
   ];
 
   if (userStore.currentUser?.role === 'admin') {
-    items.push({
+    items.splice(2, 0, {
       label: 'Users',
       icon: 'pi pi-users',
       command: () => router.push({ name: 'Users' }),

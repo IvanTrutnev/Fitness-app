@@ -22,6 +22,11 @@ const routes = [
         component: Profile,
       },
       {
+        path: 'visits',
+        name: 'Visits',
+        component: () => import('@/pages/visits/VIsits.vue'),
+      },
+      {
         path: 'users',
         name: 'Users',
         component: Users,

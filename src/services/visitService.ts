@@ -89,12 +89,24 @@ export class VisitService {
    */
   static async getUserVisits(
     userId: string,
-    options?: { limit?: number; skip?: number; trainerId?: string },
+    options?: {
+      limit?: number;
+      skip?: number;
+      trainerId?: string;
+      dateFrom?: Date;
+      dateTo?: Date;
+    },
   ) {
     const filter: any = { userId };
 
     if (options?.trainerId) {
       filter.trainerId = options.trainerId;
+    }
+
+    if (options?.dateFrom || options?.dateTo) {
+      filter.date = {};
+      if (options.dateFrom) filter.date.$gte = options.dateFrom;
+      if (options.dateTo) filter.date.$lte = options.dateTo;
     }
 
     const visits = await Visit.find(filter)
@@ -112,12 +124,24 @@ export class VisitService {
    */
   static async getTrainerVisits(
     trainerId: string,
-    options?: { limit?: number; skip?: number; userId?: string },
+    options?: {
+      limit?: number;
+      skip?: number;
+      userId?: string;
+      dateFrom?: Date;
+      dateTo?: Date;
+    },
   ) {
     const filter: any = { trainerId };
 
     if (options?.userId) {
       filter.userId = options.userId;
+    }
+
+    if (options?.dateFrom || options?.dateTo) {
+      filter.date = {};
+      if (options.dateFrom) filter.date.$gte = options.dateFrom;
+      if (options.dateTo) filter.date.$lte = options.dateTo;
     }
 
     const visits = await Visit.find(filter)
