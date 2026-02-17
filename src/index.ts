@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import balanceRoutes from './routes/balance';
+import visitRoutes from './routes/visits';
 import cors from 'cors';
 
 dotenv.config();
@@ -46,6 +47,7 @@ async function connectMongo() {
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/balance', balanceRoutes);
+app.use('/visits', visitRoutes);
 
 app.get('/', (_, res) => {
   res.send('Hello from Express + TS + Hot Reload!');

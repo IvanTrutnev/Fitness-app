@@ -73,3 +73,6 @@ users.txt
 # Uploads/media
 uploads/
 media/
+
+src/utils/checkIndexPerformance.js
+src/utils/explainIndexInternals.js

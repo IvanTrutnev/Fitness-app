@@ -1,5 +1,4 @@
 // src/services/balanceService.ts
-import mongoose from 'mongoose';
 import { Balance } from '../models/Balance';
 import { VisitHistory } from '../models/VisitHistory';
 
@@ -93,66 +92,104 @@ export class BalanceService {
   }
 
   /**
-   * Use one visit
+   * Use one visit (atomic operation)
    */
   static async useVisit(
     userId: string,
     notes?: string,
-  ): Promise<{ success: boolean; message: string; remainingVisits?: number }> {
-    const session = await mongoose.startSession();
-
+  ): Promise<{
+    success: boolean;
+    message: string;
+    remainingVisits?: number;
+    balanceId?: any;
+  }> {
     try {
-      session.startTransaction();
-
-      // Find active balance
-      const balance = await BalanceService.getActiveBalance(userId);
+      // Atomic operation: find balance and decrease visits in one go
+      const balance = await Balance.findOneAndUpdate(
+        {
+          userId,
+          isActive: true,
+          visits: { $gt: 0 }, // Only if visits > 0
+          dueDate: { $gt: new Date() }, // Only if not expired
+        },
+        {
+          $inc: { visits: -1 }, // Atomically decrease visits
+        },
+        {
+          new: true, // Return updated document
+        },
+      );
 
       if (!balance) {
         return {
           success: false,
-          message: 'You have no active balance or visits have run out',
+          message:
+            'You have no active balance, visits have run out, or balance has expired',
         };
       }
 
-      if (balance.dueDate < new Date()) {
-        // Deactivate expired balance
-        balance.isActive = false;
-        await balance.save({ session });
-
-        return {
-          success: false,
-          message: 'Balance has expired',
-        };
-      }
-
-      // Deduct visit
-      balance.visits -= 1;
+      // If visits reached 0, deactivate balance
       if (balance.visits === 0) {
-        balance.isActive = false;
+        await Balance.findByIdAndUpdate(balance._id, {
+          isActive: false,
+        });
       }
-      await balance.save({ session });
 
-      // Record in history
-      const visitHistory = new VisitHistory({
-        userId,
-        balanceId: balance._id,
-        visitDate: new Date(),
-        notes,
-      });
-      await visitHistory.save({ session });
-
-      await session.commitTransaction();
+      // Record in history (if this fails, balance is already decremented, but that's acceptable)
+      try {
+        const visitHistory = new VisitHistory({
+          userId,
+          balanceId: balance._id,
+          visitDate: new Date(),
+          notes,
+        });
+        await visitHistory.save();
+      } catch (error) {
+        console.error('Failed to save visit history:', error);
+        // Continue - history is not critical for business logic
+      }
 
       return {
         success: true,
         message: 'Visit successfully deducted',
         remainingVisits: balance.visits,
+        balanceId: balance._id,
       };
     } catch (error) {
-      await session.abortTransaction();
       throw error;
-    } finally {
-      session.endSession();
+    }
+  }
+
+  /**
+   * Refund visit (compensation method)
+   */
+  static async refundVisit(balanceId: string) {
+    try {
+      // Atomically increase visits back
+      const balance = await Balance.findByIdAndUpdate(
+        balanceId,
+        {
+          $inc: { visits: 1 },
+          $set: { isActive: true }, // Reactivate if needed
+        },
+        { new: true },
+      );
+
+      // Remove the latest visit history record for this balance
+      await VisitHistory.findOneAndDelete(
+        {
+          balanceId,
+          userId: balance?.userId,
+        },
+        {
+          sort: { visitDate: -1 }, // Remove the latest one
+        },
+      );
+
+      return balance;
+    } catch (error) {
+      console.error('Failed to refund visit:', error);
+      throw error;
     }
   }
 

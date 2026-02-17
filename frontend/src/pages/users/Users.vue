@@ -71,14 +71,25 @@
       </Column>
       <Column header="Actions" v-if="isAdmin">
         <template #body="{ data }">
-          <Button
-            v-if="data.role === UserRole.USER"
-            icon="pi pi-plus"
-            label="Add Balance"
-            size="small"
-            outlined
-            @click.stop="openAddBalanceDialog(data)"
-          />
+          <div class="actions-buttons">
+            <Button
+              v-if="data.role === UserRole.USER"
+              icon="pi pi-plus"
+              label="Add Balance"
+              size="small"
+              outlined
+              @click.stop="openAddBalanceDialog(data)"
+            />
+            <Button
+              v-if="data.role === UserRole.USER"
+              icon="pi pi-calendar-plus"
+              label="Add Visit"
+              size="small"
+              outlined
+              severity="secondary"
+              @click.stop="openAddVisitDialog(data)"
+            />
+          </div>
         </template>
       </Column>
     </DataTable>
@@ -89,6 +100,14 @@
       :user="selectedUser"
       :loading="isSubmittingBalance"
       @submit="submitBalance"
+    />
+
+    <!-- Add Visit Dialog -->
+    <AddVisitDialog
+      v-model:visible="showVisitDialog"
+      :user="selectedUserForVisit"
+      :loading="isSubmittingVisit"
+      @submit="submitVisit"
     />
 
     <Toast />
@@ -106,10 +125,12 @@ import Button from 'primevue/button';
 import Tag from 'primevue/tag';
 import Toast from 'primevue/toast';
 import AddBalanceDialog from '@/components/AddBalanceDialog.vue';
+import AddVisitDialog from '@/components/AddVisitDialog.vue';
 import { UserRole } from '@/constants/user';
 import { useUserStore } from '@/store/user';
 import { useToast } from 'primevue/usetoast';
 import type { BalanceForm } from '@/types/balance';
+import type { VisitForm } from '@/types/visit';
 
 const users = ref([]);
 const selectedRole = ref<string | null>(null);
@@ -121,6 +142,11 @@ const toast = useToast();
 const showBalanceDialog = ref(false);
 const selectedUser = ref<any>(null);
 const isSubmittingBalance = ref(false);
+
+// Visit dialog state
+const showVisitDialog = ref(false);
+const selectedUserForVisit = ref<any>(null);
+const isSubmittingVisit = ref(false);
 
 const isAdmin = computed(() => {
   return userStore.currentUser?.role === UserRole.ADMIN;
@@ -191,6 +217,11 @@ const openAddBalanceDialog = (user: any) => {
   showBalanceDialog.value = true;
 };
 
+const openAddVisitDialog = (user: any) => {
+  selectedUserForVisit.value = user;
+  showVisitDialog.value = true;
+};
+
 const submitBalance = async (form: BalanceForm) => {
   if (!selectedUser.value) return;
 
@@ -225,6 +256,46 @@ const submitBalance = async (form: BalanceForm) => {
     });
   } finally {
     isSubmittingBalance.value = false;
+  }
+};
+
+const submitVisit = async (form: VisitForm) => {
+  if (!selectedUserForVisit.value) return;
+
+  isSubmittingVisit.value = true;
+
+  try {
+    await api.post('/visits', {
+      userId: form.userId,
+      trainerId: form.trainerId,
+      date: form.date.toISOString(),
+      price: form.price,
+      notes: form.notes,
+      useBalance: form.useBalance,
+    });
+
+    toast.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: `Visit added for ${selectedUserForVisit.value.email}`,
+      life: 3000,
+    });
+
+    showVisitDialog.value = false;
+    // Reload users list to show updated balance if balance was used
+    if (form.useBalance) {
+      loadUsers();
+    }
+  } catch (error) {
+    console.error('Failed to add visit:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to add visit',
+      life: 3000,
+    });
+  } finally {
+    isSubmittingVisit.value = false;
   }
 };
 
@@ -286,5 +357,11 @@ onMounted(() => {
 .no-balance {
   color: #9ca3af;
   font-style: italic;
+}
+
+.actions-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 </style>

@@ -1,41 +1,12 @@
 // src/routes/auth.ts
 import { Router } from 'express';
-import { User } from '../models/User';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { registerValidator, loginValidator } from '../utils/validators';
 import { validationResult } from 'express-validator';
 import { authMiddleware } from '../middleware/authMiddleware';
+import { AuthService } from '../services/authService';
 import { Request, Response } from 'express';
 
 const router = Router();
-
-// --- Token Generators ---
-const generateAccessToken = (user: any) => {
-  return jwt.sign(
-    {
-      id: user._id,
-      email: user.email,
-      username: user.username,
-      role: user.role,
-    },
-    process.env.JWT_SECRET!,
-    { expiresIn: '20m' },
-  );
-};
-
-const generateRefreshToken = (user: any) => {
-  return jwt.sign(
-    {
-      id: user._id,
-      email: user.email,
-      username: user.username,
-      role: user.role,
-    },
-    process.env.JWT_REFRESH_SECRET!,
-    { expiresIn: '7d' },
-  );
-};
 
 // --- Register ---
 router.post(
@@ -49,34 +20,18 @@ router.post(
     const { email, password } = req.body;
 
     try {
-      const existing = await User.findOne({ email });
-      if (existing) {
-        return res
-          .status(400)
-          .json({ message: 'User with this email already exists' });
-      }
-
-      const hash = await bcrypt.hash(password, 10);
-      const user = new User({
-        email,
-        password: hash,
-        username: email,
-        role: 'user',
-      });
-      await user.save();
-
-      const userResponse = {
-        _id: user._id,
-        email: user.email,
-        username: user.username,
-        role: user.role,
-      };
-
+      const user = await AuthService.register(email, password);
       res.status(201).json({
         message: 'User created successfully',
-        user: userResponse,
+        user,
       });
     } catch (err) {
+      if (
+        err instanceof Error &&
+        err.message === 'User with this email already exists'
+      ) {
+        return res.status(400).json({ message: err.message });
+      }
       res.status(500).json({ message: 'Server error', error: err });
     }
   },
@@ -91,35 +46,12 @@ router.post('/login', loginValidator, async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: 'Invalid credentials' });
-
-    const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid)
-      return res.status(401).json({ message: 'Invalid credentials' });
-
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
-
-    user.refreshToken = refreshToken;
-    await user.save();
-
-    // Возвращаем токены и данные пользователя
-    const userResponse = {
-      _id: user._id,
-      email: user.email,
-      username: user.username,
-      role: user.role,
-      avatarUrl: user.avatarUrl,
-      phone: user.phone,
-    };
-
-    res.json({
-      accessToken,
-      refreshToken,
-      user: userResponse,
-    });
+    const result = await AuthService.login(email, password);
+    res.json(result);
   } catch (err) {
+    if (err instanceof Error && err.message === 'Invalid credentials') {
+      return res.status(401).json({ message: err.message });
+    }
     res.status(500).json({ message: 'Server error', error: err });
   }
 });
@@ -127,24 +59,19 @@ router.post('/login', loginValidator, async (req: Request, res: Response) => {
 // --- Refresh Token ---
 router.post('/refresh', async (req: Request, res: Response) => {
   const { refreshToken } = req.body;
-  if (!refreshToken) return res.status(401).json({ message: 'Missing token' });
 
   try {
-    const payload = jwt.verify(
-      refreshToken,
-      process.env.JWT_REFRESH_SECRET!,
-    ) as {
-      id: string;
-      email: string;
-    };
-
-    const user = await User.findById(payload.id);
-    if (!user || user.refreshToken !== refreshToken)
-      return res.status(403).json({ message: 'Invalid token' });
-
-    const newAccessToken = generateAccessToken(user);
-    res.json({ accessToken: newAccessToken });
+    const result = await AuthService.refreshToken(refreshToken);
+    res.json(result);
   } catch (err) {
+    if (err instanceof Error) {
+      if (err.message === 'Missing token') {
+        return res.status(401).json({ message: err.message });
+      }
+      if (err.message === 'Invalid token') {
+        return res.status(403).json({ message: err.message });
+      }
+    }
     res.status(403).json({ message: 'Invalid refresh token', error: err });
   }
 });
@@ -152,24 +79,19 @@ router.post('/refresh', async (req: Request, res: Response) => {
 // --- Logout ---
 router.post('/logout', async (req: Request, res: Response) => {
   const { refreshToken } = req.body;
-  if (!refreshToken) return res.status(400).json({ message: 'Missing token' });
 
   try {
-    const payload = jwt.verify(
-      refreshToken,
-      process.env.JWT_REFRESH_SECRET!,
-    ) as {
-      id: string;
-    };
-
-    const user = await User.findById(payload.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    user.refreshToken = undefined;
-    await user.save();
-
-    res.json({ message: 'Logged out successfully' });
+    const result = await AuthService.logout(refreshToken);
+    res.json(result);
   } catch (err) {
+    if (err instanceof Error) {
+      if (err.message === 'Missing token') {
+        return res.status(400).json({ message: err.message });
+      }
+      if (err.message === 'User not found') {
+        return res.status(404).json({ message: err.message });
+      }
+    }
     res.status(403).json({ message: 'Invalid token', error: err });
   }
 });
