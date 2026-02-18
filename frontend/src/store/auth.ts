@@ -7,9 +7,9 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   actions: {
-    async login(email: string, password: string) {
+    async login(identifier: string, password: string) {
       try {
-        const res = await api.post('/auth/login', { email, password });
+        const res = await api.post('/auth/login', { identifier, password });
         this.token = res.data.accessToken;
         localStorage.setItem('token', this.token);
         localStorage.setItem('refreshToken', res.data.refreshToken); // 👈
@@ -19,9 +19,9 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    async register(email: string, password: string) {
+    async register(identifier: string, password: string) {
       try {
-        await api.post('/auth/register', { email, password });
+        await api.post('/auth/register', { identifier, password });
       } catch (error) {
         console.error('Registration failed:', error);
         throw error;

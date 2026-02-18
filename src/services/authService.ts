@@ -40,25 +40,43 @@ export class AuthService {
   /**
    * Register new user
    */
-  static async register(email: string, password: string) {
-    const existing = await User.findOne({ email });
+  static async register(identifier: string, password: string) {
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+    const isPhone = /^\+?[1-9]\d{1,14}$/.test(identifier);
+
+    if (!isEmail && !isPhone) {
+      throw new Error('Please provide a valid email or phone number');
+    }
+
+    const query = isEmail ? { email: identifier } : { phone: identifier };
+    const existing = await User.findOne(query);
+
     if (existing) {
-      throw new Error('User with this email already exists');
+      throw new Error(
+        `User with this ${isEmail ? 'email' : 'phone number'} already exists`,
+      );
     }
 
     const hash = await bcrypt.hash(password, 10);
-    const user = new User({
-      email,
+    const userData: any = {
       password: hash,
-      username: email,
+      username: identifier,
       role: UserRole.USER,
-    });
+    };
 
+    if (isEmail) {
+      userData.email = identifier;
+    } else {
+      userData.phone = identifier;
+    }
+
+    const user = new User(userData);
     await user.save();
 
     return {
       _id: user._id,
       email: user.email,
+      phone: user.phone,
       username: user.username,
       role: user.role,
     };
@@ -67,8 +85,11 @@ export class AuthService {
   /**
    * Login user
    */
-  static async login(email: string, password: string) {
-    const user = await User.findOne({ email });
+  static async login(identifier: string, password: string) {
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+    const query = isEmail ? { email: identifier } : { phone: identifier };
+
+    const user = await User.findOne(query);
     if (!user) {
       throw new Error('Invalid credentials');
     }
@@ -88,10 +109,10 @@ export class AuthService {
     const userResponse = {
       _id: user._id,
       email: user.email,
+      phone: user.phone,
       username: user.username,
       role: user.role,
       avatarUrl: user.avatarUrl,
-      phone: user.phone,
     };
 
     return {

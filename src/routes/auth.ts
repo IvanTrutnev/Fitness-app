@@ -17,20 +17,22 @@ router.post(
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
 
-    const { email, password } = req.body;
+    const { identifier, password } = req.body;
 
     try {
-      const user = await AuthService.register(email, password);
+      const user = await AuthService.register(identifier, password);
       res.status(201).json({
         message: 'User created successfully',
         user,
       });
     } catch (err) {
-      if (
-        err instanceof Error &&
-        err.message === 'User with this email already exists'
-      ) {
-        return res.status(400).json({ message: err.message });
+      if (err instanceof Error) {
+        if (
+          err.message.includes('already exists') ||
+          err.message.includes('valid email or phone')
+        ) {
+          return res.status(400).json({ message: err.message });
+        }
       }
       res.status(500).json({ message: 'Server error', error: err });
     }
@@ -43,10 +45,10 @@ router.post('/login', loginValidator, async (req: Request, res: Response) => {
   if (!errors.isEmpty())
     return res.status(400).json({ errors: errors.array() });
 
-  const { email, password } = req.body;
+  const { identifier, password } = req.body;
 
   try {
-    const result = await AuthService.login(email, password);
+    const result = await AuthService.login(identifier, password);
     res.json(result);
   } catch (err) {
     if (err instanceof Error && err.message === 'Invalid credentials') {

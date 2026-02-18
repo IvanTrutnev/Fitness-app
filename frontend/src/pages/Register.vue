@@ -7,16 +7,16 @@
         <div class="w-full">
           <FloatLabel>
             <InputText
-              id="email"
-              v-model="email"
-              :class="{ 'p-invalid': emailError }"
-              @blur="validateEmail"
+              id="identifier"
+              v-model="identifier"
+              :class="{ 'p-invalid': identifierError }"
+              @blur="validateIdentifier"
               class="w-full"
             />
-            <label for="email">Email</label>
+            <label for="identifier">Email or Phone</label>
           </FloatLabel>
-          <small v-if="emailError" class="text-red-600"
-            >Please enter a valid email address</small
+          <small v-if="identifierError" class="text-red-600"
+            >Please enter a valid email address or phone number</small
           >
         </div>
 
@@ -69,17 +69,20 @@ import Password from 'primevue/password';
 import Button from 'primevue/button';
 import FloatLabel from 'primevue/floatlabel';
 
-const email = ref('');
+const identifier = ref('');
 const password = ref('');
 const loading = ref(false);
-const emailError = ref(false);
+const identifierError = ref(false);
 const passwordError = ref(false);
 
 const router = useRouter();
 const auth = useAuthStore();
 
-const validateEmail = () => {
-  emailError.value = !/^\S+@\S+\.\S+$/.test(email.value);
+const validateIdentifier = () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+  identifierError.value =
+    !emailRegex.test(identifier.value) && !phoneRegex.test(identifier.value);
 };
 
 const validatePassword = () => {
@@ -87,13 +90,13 @@ const validatePassword = () => {
 };
 
 const onRegister = async () => {
-  validateEmail();
+  validateIdentifier();
   validatePassword();
-  if (emailError.value || passwordError.value) return;
+  if (identifierError.value || passwordError.value) return;
 
   loading.value = true;
   try {
-    await auth.register(email.value, password.value);
+    await auth.register(identifier.value, password.value);
     router.push('/login');
   } catch (err) {
     console.error('Register failed', err);

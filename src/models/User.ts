@@ -3,11 +3,11 @@ import mongoose from 'mongoose';
 import { USER_ROLES, UserRole } from '../constants/user';
 
 const UserSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
+  email: { type: String, sparse: true, unique: true },
+  phone: { type: String, sparse: true, unique: true },
   password: { type: String, required: true },
   refreshToken: { type: String },
   avatarUrl: { type: String },
-  phone: { type: String },
   username: { type: String, required: true, unique: true },
   role: { type: String, enum: USER_ROLES, default: UserRole.USER },
 });
