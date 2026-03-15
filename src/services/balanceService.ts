@@ -1,6 +1,7 @@
 // src/services/balanceService.ts
 import { Balance } from '../models/Balance';
 import { VisitHistory } from '../models/VisitHistory';
+import { EventPublisher } from '../kafka/eventPublisher';
 
 export class BalanceService {
   /**
@@ -69,7 +70,24 @@ export class BalanceService {
       isActive: true,
     });
 
-    return balance.save();
+    const savedBalance = await balance.save();
+
+    // 📤 Publish Kafka event
+    try {
+      await EventPublisher.publishBalanceCreated({
+        userId,
+        balanceId: savedBalance._id.toString(),
+        visits,
+        dueDate,
+        price,
+        notes,
+      });
+    } catch (error) {
+      console.error('Failed to publish balance created event:', error);
+      // Не прерываем выполнение, если Kafka недоступна
+    }
+
+    return savedBalance;
   }
 
   /**
@@ -147,6 +165,20 @@ export class BalanceService {
       } catch (error) {
         console.error('Failed to save visit history:', error);
         // Continue - history is not critical for business logic
+      }
+
+      // 📤 Publish Kafka event for visit usage
+      try {
+        await EventPublisher.publishBalanceVisitUsed({
+          userId,
+          balanceId: balance._id.toString(),
+          previousVisits: balance.visits + 1, // Before decrement
+          remainingVisits: balance.visits,
+          notes,
+        });
+      } catch (error) {
+        console.error('Failed to publish balance visit used event:', error);
+        // Don't interrupt execution if Kafka is unavailable
       }
 
       return {

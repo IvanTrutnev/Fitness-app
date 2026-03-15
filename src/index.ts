@@ -7,6 +7,7 @@ import userRoutes from './routes/users';
 import balanceRoutes from './routes/balance';
 import visitRoutes from './routes/visits';
 import cors from 'cors';
+import { KafkaManager } from './kafka/kafkaManager';
 
 dotenv.config();
 
@@ -60,6 +61,16 @@ async function start() {
 
     await connectMongo();
 
+    // Initialize Kafka
+    try {
+      await KafkaManager.initialize();
+    } catch (kafkaError) {
+      console.error(
+        '⚠️ Kafka initialization failed, continuing without it:',
+        kafkaError,
+      );
+    }
+
     app.listen(port, () => {
       console.log(`🚀 Server running on http://localhost:${port}`);
     });
@@ -69,3 +80,28 @@ async function start() {
 }
 
 start();
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('🛑 Received SIGINT, shutting down gracefully...');
+
+  try {
+    await KafkaManager.shutdown();
+    process.exit(0);
+  } catch (error) {
+    console.error('❌ Error during shutdown:', error);
+    process.exit(1);
+  }
+});
+
+process.on('SIGTERM', async () => {
+  console.log('🛑 Received SIGTERM, shutting down gracefully...');
+
+  try {
+    await KafkaManager.shutdown();
+    process.exit(0);
+  } catch (error) {
+    console.error('❌ Error during shutdown:', error);
+    process.exit(1);
+  }
+});

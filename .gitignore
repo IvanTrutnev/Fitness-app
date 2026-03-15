@@ -76,3 +76,6 @@ media/
 
 src/utils/checkIndexPerformance.js
 src/utils/explainIndexInternals.js
+
+
+KAFKA_GUIDE.md

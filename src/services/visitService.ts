@@ -2,6 +2,7 @@
 import { Visit } from '../models/Visit';
 import { BalanceService } from './balanceService';
 import { UserRole } from '../constants/user';
+import { EventPublisher } from '../kafka/eventPublisher';
 
 export class VisitService {
   /**
@@ -68,6 +69,22 @@ export class VisitService {
       // Populate trainer info if exists
       await visit.populate('trainerId', 'email username avatarUrl');
       await visit.populate('userId', 'email username avatarUrl');
+
+      // 📤 Publish Kafka event for visit creation
+      try {
+        await EventPublisher.publishVisitCreated({
+          userId: data.userId,
+          visitId: visit._id.toString(),
+          balanceId: visitData.balanceId?.toString(),
+          trainerId: data.trainerId,
+          wasBalanceUsed: visitData.wasBalanceUsed,
+          price: data.price,
+          notes: data.notes,
+        });
+      } catch (error) {
+        console.error('Failed to publish visit created event:', error);
+        // Don't interrupt execution if Kafka is unavailable
+      }
 
       return visit;
     } catch (error) {

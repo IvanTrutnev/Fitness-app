@@ -1,6 +1,7 @@
 // src/services/documentService.ts
 import { Document } from '../models/Document';
 import { cloudinary } from '../utils/cloudinary';
+import { EventPublisher } from '../kafka/eventPublisher';
 
 export class DocumentService {
   /**
@@ -80,6 +81,24 @@ export class DocumentService {
 
     await document.save();
     console.log('✅ Document saved successfully');
+
+    // 📤 Publish Kafka event for document upload
+    try {
+      await EventPublisher.publishAnalytics({
+        userId,
+        eventType: 'document_uploaded',
+        data: {
+          documentId: document._id.toString(),
+          originalName: document.originalName,
+          mimeType: document.mimeType,
+          size: document.size,
+          category: document.category,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to publish document uploaded event:', error);
+      // Don't interrupt upload if Kafka is unavailable
+    }
 
     return {
       _id: document._id,

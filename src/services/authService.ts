@@ -3,6 +3,7 @@ import { User } from '../models/User';
 import { UserRole } from '../constants/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { EventPublisher } from '../kafka/eventPublisher';
 
 export class AuthService {
   /**
@@ -73,6 +74,18 @@ export class AuthService {
     const user = new User(userData);
     await user.save();
 
+    // 📤 Publish Kafka event for user registration
+    try {
+      await EventPublisher.publishUserRegistered({
+        userId: user._id.toString(),
+        userEmail: userData.email || '',
+        role: userData.role,
+      });
+    } catch (error) {
+      console.error('Failed to publish user registered event:', error);
+      // Don't interrupt registration if Kafka is unavailable
+    }
+
     return {
       _id: user._id,
       email: user.email,
@@ -114,6 +127,17 @@ export class AuthService {
       role: user.role,
       avatarUrl: user.avatarUrl,
     };
+
+    // 📤 Publish Kafka event for user login
+    try {
+      await EventPublisher.publishUserLogin({
+        userId: user._id.toString(),
+        userEmail: user.email || '',
+      });
+    } catch (error) {
+      console.error('Failed to publish user login event:', error);
+      // Don't interrupt login if Kafka is unavailable
+    }
 
     return {
       accessToken,
