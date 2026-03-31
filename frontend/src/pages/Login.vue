@@ -64,6 +64,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/store/auth';
+import { useToast } from 'primevue/usetoast';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Button from 'primevue/button';
@@ -77,6 +78,7 @@ const passwordError = ref(false);
 
 const router = useRouter();
 const auth = useAuthStore();
+const toast = useToast();
 
 const validateIdentifier = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -98,8 +100,10 @@ const onLogin = async () => {
   try {
     await auth.login(identifier.value, password.value);
     router.push('/users');
-  } catch (err) {
-    console.error('Login failed', err);
+  } catch (err: any) {
+    const message =
+      err?.response?.data?.message || err?.message || 'Invalid email or password';
+    toast.add({ severity: 'error', summary: 'Login failed', detail: message, life: 4000 });
   } finally {
     loading.value = false;
   }

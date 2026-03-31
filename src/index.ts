@@ -14,7 +14,9 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
+  : ['http://localhost:5173', 'http://127.0.0.1:5173'];
 
 app.use(
   cors({
@@ -30,10 +32,6 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-const sequelize = new Sequelize(process.env.POSTGRES_URL!, {
-  dialect: 'postgres',
-});
 
 async function connectMongo() {
   try {
@@ -54,10 +52,21 @@ app.get('/', (_, res) => {
   res.send('Hello from Express + TS + Hot Reload!');
 });
 
+async function connectPostgres() {
+  if (!process.env.POSTGRES_URL) {
+    console.log('ℹ️  POSTGRES_URL not set, skipping PostgreSQL');
+    return;
+  }
+  const sequelize = new Sequelize(process.env.POSTGRES_URL, {
+    dialect: 'postgres',
+  });
+  await sequelize.authenticate();
+  console.log('✅ PostgreSQL connected');
+}
+
 async function start() {
   try {
-    await sequelize.authenticate();
-    console.log('✅ PostgreSQL connected');
+    await connectPostgres();
 
     await connectMongo();
 

@@ -1,6 +1,6 @@
 // src/kafka/eventPublisher.ts
 import { v4 as uuidv4 } from 'uuid';
-import { producer, TOPICS } from './config';
+import { producer, TOPICS, KAFKA_ENABLED } from './config';
 import type {
   BaseEvent,
   BalanceEvent,
@@ -44,6 +44,10 @@ export class EventPublisher {
   }
 
   private static async publish(topic: string, event: any) {
+    if (!KAFKA_ENABLED) {
+      return;
+    }
+
     try {
       await this.connect();
 
@@ -65,7 +69,6 @@ export class EventPublisher {
       });
     } catch (error) {
       console.error(`❌ Failed to publish event to ${topic}:`, error);
-      // В production можно добавить retry логику или fallback
     }
   }
 

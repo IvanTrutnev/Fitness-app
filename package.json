@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
+    "start": "node dist/index.js",
     "kafka:up": "docker-compose -f docker-compose-kafka.yml up -d",
     "kafka:down": "docker-compose -f docker-compose-kafka.yml down",
     "kafka:logs": "docker-compose -f docker-compose-kafka.yml logs -f kafka",

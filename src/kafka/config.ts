@@ -4,6 +4,12 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Kafka is considered enabled when KAFKA_BROKERS is explicitly set or
+// KAFKA_CONSUME_EVENTS is not 'false'. In production without brokers configured
+// the app continues without Kafka -- see KafkaManager.
+export const KAFKA_ENABLED =
+  process.env.KAFKA_CONSUME_EVENTS !== 'false' || !!process.env.KAFKA_BROKERS;
+
 export const kafka = new Kafka({
   clientId: 'fitness-app',
   brokers: process.env.KAFKA_BROKERS?.split(',') || ['localhost:9092'],
@@ -14,6 +20,16 @@ export const kafka = new Kafka({
   },
   connectionTimeout: 3000,
   requestTimeout: 30000,
+  // Upstash Kafka (and other cloud brokers) require SASL/SSL.
+  // Set KAFKA_SASL_USERNAME + KAFKA_SASL_PASSWORD to enable.
+  ...(process.env.KAFKA_SASL_USERNAME && {
+    ssl: true,
+    sasl: {
+      mechanism: 'scram-sha-256' as const,
+      username: process.env.KAFKA_SASL_USERNAME,
+      password: process.env.KAFKA_SASL_PASSWORD!,
+    },
+  }),
 });
 
 export const producer = kafka.producer({
