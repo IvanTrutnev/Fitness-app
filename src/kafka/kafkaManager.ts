@@ -1,6 +1,7 @@
 // src/kafka/kafkaManager.ts
 import { EventPublisher } from './eventPublisher';
 import { EventConsumer } from './eventConsumer';
+import { KAFKA_ENABLED } from './config';
 
 export class KafkaManager {
   private static isInitialized = false;
@@ -9,6 +10,11 @@ export class KafkaManager {
    * Initialize Kafka (connect producer and start consumer)
    */
   static async initialize() {
+    if (!KAFKA_ENABLED) {
+      console.log('ℹ️  Kafka disabled (KAFKA_CONSUME_EVENTS=false), skipping');
+      return;
+    }
+
     if (this.isInitialized) {
       console.log('⚠️ Kafka already initialized');
       return;
