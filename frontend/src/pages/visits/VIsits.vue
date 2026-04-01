@@ -2,260 +2,264 @@
   <div class="p-m-4">
     <h2>Visits</h2>
 
-    <!-- Фильтры -->
-    <div class="filters-section">
-      <h4>Filters:</h4>
-      <div class="filters-row">
-        <!-- Admin sees all filters -->
-        <template v-if="isAdmin">
-          <div class="filter-item">
-            <label>User:</label>
-            <Select
-              v-model="filters.userId"
-              :options="users"
-              optionLabel="email"
-              optionValue="_id"
-              placeholder="All users"
-              style="width: 200px"
-              showClear
-            />
-          </div>
-          <div class="filter-item">
-            <label>Trainer:</label>
-            <Select
-              v-model="filters.trainerId"
-              :options="trainers"
-              optionLabel="email"
-              optionValue="_id"
-              placeholder="All trainers"
-              style="width: 200px"
-              showClear
-            />
-          </div>
-        </template>
+    <Tabs value="table" @update:value="onTabChange">
+      <TabList>
+        <Tab value="table"><i class="pi pi-list" style="margin-right: 6px" />Table</Tab>
+        <Tab value="calendar"><i class="pi pi-calendar" style="margin-right: 6px" />Calendar</Tab>
+      </TabList>
 
-        <!-- Trainer sees user and date filters -->
-        <template v-else-if="isTrainer">
-          <div class="filter-item">
-            <label>User:</label>
-            <Select
-              v-model="filters.userId"
-              :options="users"
-              optionLabel="email"
-              optionValue="_id"
-              placeholder="All users"
-              style="width: 200px"
-              showClear
-            />
+      <TabPanels>
+        <!-- ─── Tab 1: Table + Filters + Stats ─── -->
+        <TabPanel value="table">
+          <div class="filters-section">
+            <h4>Filters:</h4>
+            <div class="filters-row">
+              <template v-if="isAdmin">
+                <div class="filter-item">
+                  <label>User:</label>
+                  <Select
+                    v-model="filters.userId"
+                    :options="users"
+                    optionLabel="email"
+                    optionValue="_id"
+                    placeholder="All users"
+                    style="width: 200px"
+                    showClear
+                  />
+                </div>
+                <div class="filter-item">
+                  <label>Trainer:</label>
+                  <Select
+                    v-model="filters.trainerId"
+                    :options="trainers"
+                    optionLabel="email"
+                    optionValue="_id"
+                    placeholder="All trainers"
+                    style="width: 200px"
+                    showClear
+                  />
+                </div>
+              </template>
+
+              <template v-else-if="isTrainer">
+                <div class="filter-item">
+                  <label>User:</label>
+                  <Select
+                    v-model="filters.userId"
+                    :options="users"
+                    optionLabel="email"
+                    optionValue="_id"
+                    placeholder="All users"
+                    style="width: 200px"
+                    showClear
+                  />
+                </div>
+              </template>
+
+              <template v-else-if="isUser">
+                <div class="filter-item">
+                  <label>Trainer:</label>
+                  <Select
+                    v-model="filters.trainerId"
+                    :options="trainers"
+                    optionLabel="email"
+                    optionValue="_id"
+                    placeholder="All trainers"
+                    style="width: 200px"
+                    showClear
+                  />
+                </div>
+              </template>
+
+              <div class="filter-item">
+                <label>Date From:</label>
+                <DatePicker
+                  v-model="filters.dateFrom"
+                  dateFormat="dd/mm/yy"
+                  style="width: 150px"
+                  showIcon
+                />
+              </div>
+              <div class="filter-item">
+                <label>Date To:</label>
+                <DatePicker
+                  v-model="filters.dateTo"
+                  dateFormat="dd/mm/yy"
+                  style="width: 150px"
+                  showIcon
+                />
+              </div>
+              <Button label="Clear" @click="clearFilters" outlined class="clear-filters-btn" />
+            </div>
           </div>
-        </template>
 
-        <!-- User sees trainer and date filters -->
-        <template v-else-if="isUser">
-          <div class="filter-item">
-            <label>Trainer:</label>
-            <Select
-              v-model="filters.trainerId"
-              :options="trainers"
-              optionLabel="email"
-              optionValue="_id"
-              placeholder="All trainers"
-              style="width: 200px"
-              showClear
-            />
+          <div v-if="loading" class="loading-container">
+            <ProgressSpinner />
           </div>
-        </template>
 
-        <!-- Date filters for everyone -->
-        <div class="filter-item">
-          <label>Date From:</label>
-          <DatePicker
-            v-model="filters.dateFrom"
-            dateFormat="dd/mm/yy"
-            style="width: 150px"
-            showIcon
-          />
-        </div>
-        <div class="filter-item">
-          <label>Date To:</label>
-          <DatePicker
-            v-model="filters.dateTo"
-            dateFormat="dd/mm/yy"
-            style="width: 150px"
-            showIcon
-          />
-        </div>
-        <Button
-          label="Clear"
-          @click="clearFilters"
-          outlined
-          class="clear-filters-btn"
-        />
-      </div>
-    </div>
-    <div v-if="loading" class="loading-container">
-      <ProgressSpinner />
-    </div>
+          <DataTable
+            v-else
+            :value="visits"
+            :paginator="true"
+            :rows="20"
+            class="visits-table"
+            sortable
+            :loading="loading"
+          >
+            <template v-if="isAdmin">
+              <Column field="userId.email" header="User" sortable>
+                <template #body="{ data }">
+                  <div class="user-cell">
+                    <img v-if="data.userId.avatarUrl" :src="data.userId.avatarUrl" alt="avatar" class="user-avatar" />
+                    <span>{{ data.userId.email }}</span>
+                  </div>
+                </template>
+              </Column>
+              <Column field="trainerId.email" header="Trainer" sortable>
+                <template #body="{ data }">
+                  <span v-if="data.trainerId">{{ data.trainerId.email }}</span>
+                  <span v-else class="no-trainer">No trainer</span>
+                </template>
+              </Column>
+              <Column field="date" header="Date" sortable>
+                <template #body="{ data }">{{ formatDate(data.date) }}</template>
+              </Column>
+              <Column field="price" header="Price" sortable>
+                <template #body="{ data }">
+                  <Tag v-if="data.wasBalanceUsed" severity="info" value="Balance" />
+                  <span v-else-if="data.price" class="price-paid">{{ formatPrice(data.price) }}</span>
+                  <Tag v-else severity="secondary" value="Free" />
+                </template>
+              </Column>
+              <Column field="notes" header="Notes">
+                <template #body="{ data }">
+                  <span v-if="data.notes" class="notes-cell">{{ data.notes }}</span>
+                  <span v-else class="no-notes">-</span>
+                </template>
+              </Column>
+            </template>
 
-    <DataTable
-      v-else
-      :value="visits"
-      :paginator="true"
-      :rows="20"
-      class="visits-table"
-      sortable
-      :loading="loading"
+            <template v-else-if="isTrainer">
+              <Column field="date" header="Date" sortable>
+                <template #body="{ data }">{{ formatDate(data.date) }}</template>
+              </Column>
+              <Column field="userId.email" header="User" sortable>
+                <template #body="{ data }">
+                  <div class="user-cell">
+                    <img v-if="data.userId.avatarUrl" :src="data.userId.avatarUrl" alt="avatar" class="user-avatar" />
+                    <span>{{ data.userId.email }}</span>
+                  </div>
+                </template>
+              </Column>
+              <Column field="price" header="Payment" sortable>
+                <template #body="{ data }">
+                  <Tag v-if="data.wasBalanceUsed" severity="info" value="Balance" />
+                  <span v-else-if="data.price" class="price-paid">{{ formatPrice(data.price) }}</span>
+                  <Tag v-else severity="secondary" value="Free" />
+                </template>
+              </Column>
+            </template>
+
+            <template v-else>
+              <Column field="date" header="Date" sortable>
+                <template #body="{ data }">{{ formatDate(data.date) }}</template>
+              </Column>
+              <Column field="trainerId.email" header="Trainer" sortable>
+                <template #body="{ data }">
+                  <span v-if="data.trainerId">{{ data.trainerId.email }}</span>
+                  <span v-else class="no-trainer">No trainer</span>
+                </template>
+              </Column>
+              <Column field="price" header="Payment" sortable>
+                <template #body="{ data }">
+                  <Tag v-if="data.wasBalanceUsed" severity="success" value="From Balance" />
+                  <span v-else-if="data.price" class="price-paid">Paid {{ formatPrice(data.price) }}</span>
+                  <Tag v-else severity="secondary" value="Free" />
+                </template>
+              </Column>
+            </template>
+
+            <template #empty>
+              <div class="empty-state"><p>No visits found</p></div>
+            </template>
+          </DataTable>
+
+          <div class="stats-section" v-if="stats">
+            <h4>Statistics</h4>
+            <div class="stats-cards">
+              <div class="stat-card">
+                <span class="stat-label">Total Visits</span>
+                <span class="stat-value">{{ stats.totalVisits }}</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Balance Visits</span>
+                <span class="stat-value">{{ stats.balanceVisits }}</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-label">Paid Visits</span>
+                <span class="stat-value">{{ stats.paidVisits }}</span>
+              </div>
+              <div class="stat-card" v-if="isAdmin || isTrainer">
+                <span class="stat-label">Revenue</span>
+                <span class="stat-value">{{ formatPrice(stats.revenue) }}</span>
+              </div>
+            </div>
+          </div>
+        </TabPanel>
+
+        <!-- ─── Tab 2: Calendar ─── -->
+        <TabPanel value="calendar">
+          <div class="calendar-wrapper">
+            <FullCalendar ref="calendarRef" :options="calendarOptions" />
+          </div>
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
+
+    <!-- Visit detail dialog -->
+    <Dialog
+      v-model:visible="showEventDialog"
+      modal
+      header="Visit Details"
+      :style="{ width: '420px' }"
+      :draggable="false"
     >
-      <!-- Admin columns -->
-      <template v-if="isAdmin">
-        <Column field="userId.email" header="User" sortable>
-          <template #body="{ data }">
-            <div class="user-cell">
-              <img
-                v-if="data.userId.avatarUrl"
-                :src="data.userId.avatarUrl"
-                alt="avatar"
-                class="user-avatar"
-              />
-              <span>{{ data.userId.email }}</span>
-            </div>
-          </template>
-        </Column>
-        <Column field="trainerId.email" header="Trainer" sortable>
-          <template #body="{ data }">
-            <span v-if="data.trainerId">
-              {{ data.trainerId.email }}
-            </span>
-            <span v-else class="no-trainer">No trainer</span>
-          </template>
-        </Column>
-        <Column field="date" header="Date" sortable>
-          <template #body="{ data }">
-            {{ formatDate(data.date) }}
-          </template>
-        </Column>
-        <Column field="price" header="Price" sortable>
-          <template #body="{ data }">
-            <span v-if="data.wasBalanceUsed" class="balance-used">
-              <Tag severity="info" value="Balance" />
-            </span>
-            <span v-else-if="data.price" class="price-paid">
-              {{ formatPrice(data.price) }}
-            </span>
-            <span v-else class="free-visit">
-              <Tag severity="secondary" value="Free" />
-            </span>
-          </template>
-        </Column>
-        <Column field="notes" header="Notes">
-          <template #body="{ data }">
-            <span v-if="data.notes" class="notes-cell">{{ data.notes }}</span>
-            <span v-else class="no-notes">-</span>
-          </template>
-        </Column>
-      </template>
-
-      <!-- Trainer columns -->
-      <template v-else-if="isTrainer">
-        <Column field="date" header="Date" sortable>
-          <template #body="{ data }">
-            {{ formatDate(data.date) }}
-          </template>
-        </Column>
-        <Column field="userId.email" header="User" sortable>
-          <template #body="{ data }">
-            <div class="user-cell">
-              <img
-                v-if="data.userId.avatarUrl"
-                :src="data.userId.avatarUrl"
-                alt="avatar"
-                class="user-avatar"
-              />
-              <span>{{ data.userId.email }}</span>
-            </div>
-          </template>
-        </Column>
-        <Column field="price" header="Payment" sortable>
-          <template #body="{ data }">
-            <span v-if="data.wasBalanceUsed" class="balance-used">
-              <Tag severity="info" value="Balance" />
-            </span>
-            <span v-else-if="data.price" class="price-paid">
-              {{ formatPrice(data.price) }}
-            </span>
-            <span v-else class="free-visit">
-              <Tag severity="secondary" value="Free" />
-            </span>
-          </template>
-        </Column>
-      </template>
-
-      <!-- User columns -->
-      <template v-else>
-        <Column field="date" header="Date" sortable>
-          <template #body="{ data }">
-            {{ formatDate(data.date) }}
-          </template>
-        </Column>
-        <Column field="trainerId.email" header="Trainer" sortable>
-          <template #body="{ data }">
-            <span v-if="data.trainerId">
-              {{ data.trainerId.email }}
-            </span>
-            <span v-else class="no-trainer">No trainer</span>
-          </template>
-        </Column>
-        <Column field="price" header="Payment" sortable>
-          <template #body="{ data }">
-            <span v-if="data.wasBalanceUsed" class="balance-used">
-              <Tag severity="success" value="From Balance" />
-            </span>
-            <span v-else-if="data.price" class="price-paid">
-              Paid {{ formatPrice(data.price) }}
-            </span>
-            <span v-else class="free-visit">
-              <Tag severity="secondary" value="Free" />
-            </span>
-          </template>
-        </Column>
-      </template>
-
-      <!-- Empty state -->
-      <template #empty>
-        <div class="empty-state">
-          <p>No visits found</p>
+      <div v-if="selectedVisit" class="event-detail">
+        <div class="event-detail-row">
+          <span class="event-detail-label">Date</span>
+          <span>{{ formatDate(selectedVisit.date) }}</span>
         </div>
-      </template>
-    </DataTable>
-
-    <div class="stats-section" v-if="stats">
-      <h4>Statistics</h4>
-      <div class="stats-cards">
-        <div class="stat-card">
-          <span class="stat-label">Total Visits</span>
-          <span class="stat-value">{{ stats.totalVisits }}</span>
+        <div class="event-detail-row" v-if="selectedVisit.userId?.email">
+          <span class="event-detail-label">User</span>
+          <div class="user-cell">
+            <img v-if="selectedVisit.userId.avatarUrl" :src="selectedVisit.userId.avatarUrl" alt="avatar" class="user-avatar" />
+            <span>{{ selectedVisit.userId.email }}</span>
+          </div>
         </div>
-        <div class="stat-card">
-          <span class="stat-label">Balance Visits</span>
-          <span class="stat-value">{{ stats.balanceVisits }}</span>
+        <div class="event-detail-row">
+          <span class="event-detail-label">Trainer</span>
+          <span v-if="selectedVisit.trainerId">{{ selectedVisit.trainerId.email }}</span>
+          <span v-else class="no-trainer">No trainer</span>
         </div>
-        <div class="stat-card">
-          <span class="stat-label">Paid Visits</span>
-          <span class="stat-value">{{ stats.paidVisits }}</span>
+        <div class="event-detail-row">
+          <span class="event-detail-label">Payment</span>
+          <Tag v-if="selectedVisit.wasBalanceUsed" severity="info" value="Balance" />
+          <span v-else-if="selectedVisit.price" class="price-paid">{{ formatPrice(selectedVisit.price) }}</span>
+          <Tag v-else severity="secondary" value="Free" />
         </div>
-        <div class="stat-card" v-if="isAdmin || isTrainer">
-          <span class="stat-label">Revenue</span>
-          <span class="stat-value">{{ formatPrice(stats.revenue) }}</span>
+        <div class="event-detail-row" v-if="selectedVisit.notes">
+          <span class="event-detail-label">Notes</span>
+          <span>{{ selectedVisit.notes }}</span>
         </div>
       </div>
-    </div>
+    </Dialog>
 
     <Toast />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import api from '@/lib/api';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -265,6 +269,17 @@ import DatePicker from 'primevue/datepicker';
 import Tag from 'primevue/tag';
 import Toast from 'primevue/toast';
 import ProgressSpinner from 'primevue/progressspinner';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
+import Dialog from 'primevue/dialog';
+import FullCalendar from '@fullcalendar/vue3';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import type { EventClickArg } from '@fullcalendar/core';
 import { useUserStore } from '@/store/user';
 import { useToast } from 'primevue/usetoast';
 import { UserRole } from '@/constants/user';
@@ -279,7 +294,18 @@ const users = ref<any[]>([]);
 const trainers = ref<any[]>([]);
 const stats = ref<VisitStats | null>(null);
 
-// State for filters (admin)
+const showEventDialog = ref(false);
+const selectedVisit = ref<Visit | null>(null);
+const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+
+const onTabChange = (value: string | number) => {
+  if (value === 'calendar') {
+    nextTick(() => {
+      calendarRef.value?.getApi().updateSize();
+    });
+  }
+};
+
 const filters = ref<{
   userId: string | null;
   trainerId: string | null;
@@ -293,10 +319,45 @@ const filters = ref<{
 });
 
 const isAdmin = computed(() => userStore.currentUser?.role === UserRole.ADMIN);
-const isTrainer = computed(
-  () => userStore.currentUser?.role === UserRole.TRAINER,
-);
+const isTrainer = computed(() => userStore.currentUser?.role === UserRole.TRAINER);
 const isUser = computed(() => userStore.currentUser?.role === UserRole.USER);
+
+// Map visits to FullCalendar events
+const calendarEvents = computed(() =>
+  visits.value.map((v) => {
+    const label = isAdmin.value || isTrainer.value
+      ? v.userId?.email ?? 'Visit'
+      : v.trainerId?.email ?? 'Training';
+
+    const color = v.wasBalanceUsed ? '#3b82f6' : v.price ? '#10b981' : '#6b7280';
+
+    return {
+      id: v._id,
+      title: label,
+      start: v.date,
+      backgroundColor: color,
+      borderColor: color,
+      extendedProps: { visit: v },
+    };
+  }),
+);
+
+const calendarOptions = computed(() => ({
+  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+  initialView: 'dayGridMonth',
+  headerToolbar: {
+    left: 'prev,next today',
+    center: 'title',
+    right: 'dayGridMonth,timeGridWeek,timeGridDay',
+  },
+  events: calendarEvents.value,
+  eventClick: (info: EventClickArg) => {
+    selectedVisit.value = info.event.extendedProps.visit as Visit;
+    showEventDialog.value = true;
+  },
+  height: 'auto',
+  locale: 'en',
+}));
 
 const loadVisits = async () => {
   loading.value = true;
@@ -309,38 +370,20 @@ const loadVisits = async () => {
     };
 
     if (isAdmin.value) {
-      // Admin sees all visits with filters
-      params = {
-        ...params,
-        userId: filters.value.userId,
-        trainerId: filters.value.trainerId,
-      };
+      params = { ...params, userId: filters.value.userId, trainerId: filters.value.trainerId };
     } else if (isTrainer.value) {
-      // Trainer sees visits to them with user filter
       endpoint = `/visits/trainer/${userStore.currentUser?._id}`;
-      params = {
-        ...params,
-        userId: filters.value.userId, // Filter by user
-      };
+      params = { ...params, userId: filters.value.userId };
     } else {
-      // User sees their own visits with trainer filter
       endpoint = '/visits/my';
-      params = {
-        ...params,
-        trainerId: filters.value.trainerId, // Filter by trainer
-      };
+      params = { ...params, trainerId: filters.value.trainerId };
     }
 
     const response = await api.get(endpoint, { params });
     visits.value = response.data.data || response.data;
   } catch (error) {
     console.error('Failed to load visits:', error);
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to load visits',
-      life: 3000,
-    });
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load visits', life: 3000 });
   } finally {
     loading.value = false;
   }
@@ -349,13 +392,8 @@ const loadVisits = async () => {
 const loadStats = async () => {
   try {
     let params: any = {};
-
-    if (isTrainer.value) {
-      params.trainerId = userStore.currentUser?._id;
-    } else if (isUser.value) {
-      params.userId = userStore.currentUser?._id;
-    }
-
+    if (isTrainer.value) params.trainerId = userStore.currentUser?._id;
+    else if (isUser.value) params.userId = userStore.currentUser?._id;
     const response = await api.get('/visits/stats', { params });
     stats.value = response.data.data;
   } catch (error) {
@@ -365,19 +403,12 @@ const loadStats = async () => {
 
 const loadFilterOptions = async () => {
   try {
-    // Load users for filter (admin and trainer need this)
     if (isAdmin.value || isTrainer.value) {
-      const usersResponse = await api.get('/users', {
-        params: { role: UserRole.USER },
-      });
+      const usersResponse = await api.get('/users', { params: { role: UserRole.USER } });
       users.value = usersResponse.data;
     }
-
-    // Load trainers for filter (admin and user need this)
     if (isAdmin.value || isUser.value) {
-      const trainersResponse = await api.get('/users', {
-        params: { role: UserRole.TRAINER },
-      });
+      const trainersResponse = await api.get('/users', { params: { role: UserRole.TRAINER } });
       trainers.value = trainersResponse.data;
     }
   } catch (error) {
@@ -386,41 +417,21 @@ const loadFilterOptions = async () => {
 };
 
 const clearFilters = () => {
-  filters.value = {
-    userId: null,
-    trainerId: null,
-    dateFrom: null,
-    dateTo: null,
-  };
-  // loadVisits will be called automatically by watcher
+  filters.value = { userId: null, trainerId: null, dateFrom: null, dateTo: null };
 };
 
-// Watch filters for automatic loading
-watch(
-  () => filters.value,
-  () => {
-    loadVisits();
-  },
-  { deep: true },
-);
+watch(() => filters.value, () => { loadVisits(); }, { deep: true });
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   return date.toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
   });
 };
 
-const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('ru-RU', {
-    style: 'currency',
-    currency: 'RUB',
-  }).format(price);
-};
+const formatPrice = (price: number) =>
+  new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(price);
 
 onMounted(() => {
   loadVisits();
@@ -479,7 +490,6 @@ onMounted(() => {
   color: #374151;
 }
 
-.apply-filters-btn,
 .clear-filters-btn {
   height: 42px;
 }
@@ -491,18 +501,9 @@ onMounted(() => {
   height: 200px;
 }
 
-.balance-used {
-  color: #2563eb;
-  font-weight: 500;
-}
-
 .price-paid {
   color: #059669;
   font-weight: 500;
-}
-
-.free-visit {
-  color: #6b7280;
 }
 
 .no-trainer,
@@ -564,5 +565,31 @@ onMounted(() => {
   font-size: 24px;
   font-weight: 700;
   color: #374151;
+}
+
+/* Calendar */
+.calendar-wrapper {
+  margin-top: 16px;
+}
+
+/* Event detail dialog */
+.event-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.event-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.event-detail-label {
+  width: 80px;
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 14px;
+  flex-shrink: 0;
 }
 </style>
