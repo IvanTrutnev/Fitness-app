@@ -18,10 +18,18 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
   : ['http://localhost:5173', 'http://127.0.0.1:5173'];
 
+const isOriginAllowed = (origin: string) =>
+  allowedOrigins.some((allowed) => {
+    if (allowed.startsWith('/') && allowed.endsWith('/')) {
+      return new RegExp(allowed.slice(1, -1)).test(origin);
+    }
+    return allowed === origin;
+  });
+
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || isOriginAllowed(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
