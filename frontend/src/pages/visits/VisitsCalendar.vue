@@ -9,7 +9,7 @@
     @update:visible="showEventDialog = $event"
     modal
     :header="t('calendar.visitDetails')"
-    :style="{ width: '420px' }"
+    :style="{ width: isMobile ? '95vw' : '420px' }"
     :draggable="false"
   >
     <div v-if="selectedVisit" class="event-detail">
@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -74,6 +74,12 @@ const props = defineProps<{
 const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
 const showEventDialog = ref(false);
 const selectedVisit = ref<Visit | null>(null);
+
+const windowWidth = ref(window.innerWidth);
+const onResize = () => { windowWidth.value = window.innerWidth; };
+onMounted(() => window.addEventListener('resize', onResize));
+onUnmounted(() => window.removeEventListener('resize', onResize));
+const isMobile = computed(() => windowWidth.value <= 640);
 
 const updateSize = () => {
   calendarRef.value?.getApi().updateSize();
@@ -108,11 +114,19 @@ const calendarEvents = computed(() =>
 const calendarOptions = computed(() => ({
   plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
   initialView: 'dayGridMonth',
-  headerToolbar: {
-    left: 'prev,next today',
-    center: 'title',
-    right: 'dayGridMonth,timeGridWeek,timeGridDay',
-  },
+  headerToolbar: isMobile.value
+    ? { left: 'prev', center: 'title', right: 'next' }
+    : { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
+  footerToolbar: isMobile.value
+    ? { left: 'today', right: 'dayGridMonth,timeGridWeek,timeGridDay' }
+    : false,
+  ...(isMobile.value && {
+    views: {
+      timeGridWeek: { titleFormat: { month: 'short', day: 'numeric' } },
+      timeGridDay: { titleFormat: { month: 'short', day: 'numeric' } },
+      dayGridMonth: { titleFormat: { month: 'short', year: 'numeric' } },
+    },
+  }),
   events: calendarEvents.value,
   eventClick: (info: EventClickArg) => {
     selectedVisit.value = info.event.extendedProps.visit as Visit;
@@ -145,12 +159,25 @@ const formatPrice = (price: number) =>
   margin-top: 16px;
 
   :deep(.fc .fc-toolbar) {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 8px;
+    align-items: center;
+  }
 
-    @media (max-width: 480px) {
-      gap: 6px;
+  :deep(.fc .fc-header-toolbar) {
+    @media (max-width: 640px) {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 4px;
     }
+  }
+
+  :deep(.fc .fc-footer-toolbar) {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   :deep(.fc .fc-toolbar-title) {
@@ -158,8 +185,20 @@ const formatPrice = (price: number) =>
     font-weight: 700;
     color: var(--gym-dark);
 
-    @media (max-width: 480px) {
-      font-size: 1rem;
+    @media (max-width: 640px) {
+      font-size: 0.875rem;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  :deep(.fc .fc-toolbar-chunk) {
+    @media (max-width: 640px) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 
@@ -173,6 +212,11 @@ const formatPrice = (price: number) =>
     transition:
       background 0.15s,
       border-color 0.15s;
+
+    @media (max-width: 640px) {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
 
     &:hover:not(:disabled) {
       background: var(--gym-accent);
@@ -246,6 +290,7 @@ const formatPrice = (price: number) =>
   :deep(.fc .fc-daygrid-event:hover) {
     filter: brightness(1.1);
   }
+
 }
 
 /* ── Event detail dialog ── */

@@ -125,6 +125,10 @@ function toggleMenu(event: Event) {
   position: sticky;
   top: 0;
   z-index: 100;
+
+  @media (max-width: 480px) {
+    padding: 0 12px;
+  }
 }
 
 .header-brand {
@@ -157,6 +161,10 @@ function toggleMenu(event: Event) {
   display: flex;
   align-items: center;
   gap: 14px;
+
+  @media (max-width: 480px) {
+    gap: 8px;
+  }
 }
 
 .user-greeting {
@@ -166,6 +174,10 @@ function toggleMenu(event: Event) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  @media (max-width: 640px) {
+    display: none;
+  }
 }
 
 .lang-toggle {
@@ -194,16 +206,26 @@ function toggleMenu(event: Event) {
   background: var(--gym-dark-secondary) !important;
   border-color: #4338ca !important;
   color: #e0e7ff !important;
-}
 
-.account-btn:hover {
-  background: var(--gym-accent) !important;
-  border-color: var(--gym-accent) !important;
-  color: #fff !important;
+  &:hover {
+    background: var(--gym-accent) !important;
+    border-color: var(--gym-accent) !important;
+    color: #fff !important;
+  }
+
+  @media (max-width: 640px) {
+    :deep(.p-button-label) {
+      display: none;
+    }
+  }
 }
 
 .app-main {
   flex: 1;
   padding: 24px;
+
+  @media (max-width: 480px) {
+    padding: 12px;
+  }
 }
 </style>
