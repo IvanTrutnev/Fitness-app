@@ -1,3 +1,26 @@
 @import 'tailwindcss';
 @import 'tailwindcss-primeui';
 @import 'primeicons/primeicons.css';
+
+:root {
+  --gym-dark: #1e1b4b;
+  --gym-dark-secondary: #312e81;
+  --gym-accent: #6366f1;
+  --gym-accent-hover: #4f46e5;
+  --gym-surface: #f5f3ff;
+  --gym-text-muted: #6b7280;
+}
+
+body {
+  background-color: var(--gym-surface);
+  color: #1e1b4b;
+}
+
+/* Плавные переходы для всех интерактивных элементов */
+.p-button {
+  transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s !important;
+}
+
+.p-button:active {
+  transform: scale(0.98);
+}

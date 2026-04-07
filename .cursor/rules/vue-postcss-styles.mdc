@@ -1,0 +1,154 @@
+---
+description: Стандарты написания стилей в Vue-файлах с использованием PostCSS
+globs: frontend/**/*.vue
+alwaysApply: false
+---
+
+# Vue PostCSS Styles
+
+Все стили в `.vue` файлах пишутся через `<style scoped lang="postcss">`.
+
+## Базовая структура
+
+```vue
+<style scoped lang="postcss">
+.component {
+  color: var(--gym-dark);
+  background: var(--gym-surface);
+}
+</style>
+```
+
+## CSS-переменные проекта
+
+Всегда используй переменные из `:root` вместо хардкода цветов:
+
+| Переменная | Значение |
+|---|---|
+| `--gym-dark` | `#111827` — основной тёмный фон |
+| `--gym-dark-secondary` | `#1f2937` — вторичный тёмный |
+| `--gym-accent` | `#f97316` — акцентный оранжевый |
+| `--gym-accent-hover` | `#ea6c00` — ховер акцента |
+| `--gym-surface` | `#f3f4f6` — светлый фон страниц |
+| `--gym-text-muted` | `#6b7280` — приглушённый текст |
+
+```postcss
+/* ❌ Плохо */
+.btn { background: #f97316; }
+
+/* ✅ Хорошо */
+.btn { background: var(--gym-accent); }
+```
+
+## PostCSS-вложенность
+
+Используй вложенность вместо дублирования селекторов:
+
+```postcss
+/* ❌ Плохо */
+.card { padding: 1rem; }
+.card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.card .card-title { font-size: 18px; }
+
+/* ✅ Хорошо */
+.card {
+  padding: 1rem;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  & .card-title {
+    font-size: 18px;
+    color: var(--gym-dark);
+  }
+}
+```
+
+## @apply с Tailwind
+
+Можно использовать `@apply` для Tailwind-утилит внутри блоков:
+
+```postcss
+.badge {
+  @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium;
+  background: var(--gym-accent);
+  color: #fff;
+}
+```
+
+## Медиазапросы
+
+```postcss
+.wrapper {
+  display: flex;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+```
+
+## Псевдоэлементы и состояния
+
+```postcss
+.hero {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  &:hover,
+  &:focus-visible {
+    outline: 2px solid var(--gym-accent);
+  }
+}
+```
+
+## Полный пример компонента
+
+```vue
+<style scoped lang="postcss">
+.login-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+
+  & .login-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gym-dark);
+    margin: 0 0 6px;
+  }
+
+  & .login-subtitle {
+    color: var(--gym-text-muted);
+    font-size: 14px;
+    margin: 0 0 28px;
+  }
+}
+
+.register-link {
+  color: var(--gym-accent);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--gym-accent-hover);
+  }
+}
+
+@media (max-width: 768px) {
+  .login-card {
+    padding: 1.5rem;
+  }
+}
+</style>
+```

@@ -1,11 +1,13 @@
 <template>
   <div class="p-m-4">
-    <h2>Visits</h2>
-
     <Tabs value="table" @update:value="onTabChange">
       <TabList>
-        <Tab value="table"><i class="pi pi-list" style="margin-right: 6px" />Table</Tab>
-        <Tab value="calendar"><i class="pi pi-calendar" style="margin-right: 6px" />Calendar</Tab>
+        <Tab value="table"
+          ><i class="pi pi-list" style="margin-right: 6px" />Table</Tab
+        >
+        <Tab value="calendar"
+          ><i class="pi pi-calendar" style="margin-right: 6px" />Calendar</Tab
+        >
       </TabList>
 
       <TabPanels>
@@ -89,7 +91,12 @@
                   showIcon
                 />
               </div>
-              <Button label="Clear" @click="clearFilters" outlined class="clear-filters-btn" />
+              <Button
+                label="Clear"
+                @click="clearFilters"
+                outlined
+                class="clear-filters-btn"
+              />
             </div>
           </div>
 
@@ -110,7 +117,12 @@
               <Column field="userId.email" header="User" sortable>
                 <template #body="{ data }">
                   <div class="user-cell">
-                    <img v-if="data.userId.avatarUrl" :src="data.userId.avatarUrl" alt="avatar" class="user-avatar" />
+                    <img
+                      v-if="data.userId.avatarUrl"
+                      :src="data.userId.avatarUrl"
+                      alt="avatar"
+                      class="user-avatar"
+                    />
                     <span>{{ data.userId.email }}</span>
                   </div>
                 </template>
@@ -122,18 +134,28 @@
                 </template>
               </Column>
               <Column field="date" header="Date" sortable>
-                <template #body="{ data }">{{ formatDate(data.date) }}</template>
+                <template #body="{ data }">{{
+                  formatDate(data.date)
+                }}</template>
               </Column>
               <Column field="price" header="Price" sortable>
                 <template #body="{ data }">
-                  <Tag v-if="data.wasBalanceUsed" severity="info" value="Balance" />
-                  <span v-else-if="data.price" class="price-paid">{{ formatPrice(data.price) }}</span>
+                  <Tag
+                    v-if="data.wasBalanceUsed"
+                    severity="info"
+                    value="Balance"
+                  />
+                  <span v-else-if="data.price" class="price-paid">{{
+                    formatPrice(data.price)
+                  }}</span>
                   <Tag v-else severity="secondary" value="Free" />
                 </template>
               </Column>
               <Column field="notes" header="Notes">
                 <template #body="{ data }">
-                  <span v-if="data.notes" class="notes-cell">{{ data.notes }}</span>
+                  <span v-if="data.notes" class="notes-cell">{{
+                    data.notes
+                  }}</span>
                   <span v-else class="no-notes">-</span>
                 </template>
               </Column>
@@ -141,20 +163,33 @@
 
             <template v-else-if="isTrainer">
               <Column field="date" header="Date" sortable>
-                <template #body="{ data }">{{ formatDate(data.date) }}</template>
+                <template #body="{ data }">{{
+                  formatDate(data.date)
+                }}</template>
               </Column>
               <Column field="userId.email" header="User" sortable>
                 <template #body="{ data }">
                   <div class="user-cell">
-                    <img v-if="data.userId.avatarUrl" :src="data.userId.avatarUrl" alt="avatar" class="user-avatar" />
+                    <img
+                      v-if="data.userId.avatarUrl"
+                      :src="data.userId.avatarUrl"
+                      alt="avatar"
+                      class="user-avatar"
+                    />
                     <span>{{ data.userId.email }}</span>
                   </div>
                 </template>
               </Column>
               <Column field="price" header="Payment" sortable>
                 <template #body="{ data }">
-                  <Tag v-if="data.wasBalanceUsed" severity="info" value="Balance" />
-                  <span v-else-if="data.price" class="price-paid">{{ formatPrice(data.price) }}</span>
+                  <Tag
+                    v-if="data.wasBalanceUsed"
+                    severity="info"
+                    value="Balance"
+                  />
+                  <span v-else-if="data.price" class="price-paid">{{
+                    formatPrice(data.price)
+                  }}</span>
                   <Tag v-else severity="secondary" value="Free" />
                 </template>
               </Column>
@@ -162,7 +197,9 @@
 
             <template v-else>
               <Column field="date" header="Date" sortable>
-                <template #body="{ data }">{{ formatDate(data.date) }}</template>
+                <template #body="{ data }">{{
+                  formatDate(data.date)
+                }}</template>
               </Column>
               <Column field="trainerId.email" header="Trainer" sortable>
                 <template #body="{ data }">
@@ -172,8 +209,14 @@
               </Column>
               <Column field="price" header="Payment" sortable>
                 <template #body="{ data }">
-                  <Tag v-if="data.wasBalanceUsed" severity="success" value="From Balance" />
-                  <span v-else-if="data.price" class="price-paid">Paid {{ formatPrice(data.price) }}</span>
+                  <Tag
+                    v-if="data.wasBalanceUsed"
+                    severity="success"
+                    value="From Balance"
+                  />
+                  <span v-else-if="data.price" class="price-paid"
+                    >Paid {{ formatPrice(data.price) }}</span
+                  >
                   <Tag v-else severity="secondary" value="Free" />
                 </template>
               </Column>
@@ -209,50 +252,15 @@
 
         <!-- ─── Tab 2: Calendar ─── -->
         <TabPanel value="calendar">
-          <div class="calendar-wrapper">
-            <FullCalendar ref="calendarRef" :options="calendarOptions" />
-          </div>
+          <VisitsCalendar
+            ref="calendarRef"
+            :visits="visits"
+            :isAdmin="isAdmin"
+            :isTrainer="isTrainer"
+          />
         </TabPanel>
       </TabPanels>
     </Tabs>
-
-    <!-- Visit detail dialog -->
-    <Dialog
-      v-model:visible="showEventDialog"
-      modal
-      header="Visit Details"
-      :style="{ width: '420px' }"
-      :draggable="false"
-    >
-      <div v-if="selectedVisit" class="event-detail">
-        <div class="event-detail-row">
-          <span class="event-detail-label">Date</span>
-          <span>{{ formatDate(selectedVisit.date) }}</span>
-        </div>
-        <div class="event-detail-row" v-if="selectedVisit.userId?.email">
-          <span class="event-detail-label">User</span>
-          <div class="user-cell">
-            <img v-if="selectedVisit.userId.avatarUrl" :src="selectedVisit.userId.avatarUrl" alt="avatar" class="user-avatar" />
-            <span>{{ selectedVisit.userId.email }}</span>
-          </div>
-        </div>
-        <div class="event-detail-row">
-          <span class="event-detail-label">Trainer</span>
-          <span v-if="selectedVisit.trainerId">{{ selectedVisit.trainerId.email }}</span>
-          <span v-else class="no-trainer">No trainer</span>
-        </div>
-        <div class="event-detail-row">
-          <span class="event-detail-label">Payment</span>
-          <Tag v-if="selectedVisit.wasBalanceUsed" severity="info" value="Balance" />
-          <span v-else-if="selectedVisit.price" class="price-paid">{{ formatPrice(selectedVisit.price) }}</span>
-          <Tag v-else severity="secondary" value="Free" />
-        </div>
-        <div class="event-detail-row" v-if="selectedVisit.notes">
-          <span class="event-detail-label">Notes</span>
-          <span>{{ selectedVisit.notes }}</span>
-        </div>
-      </div>
-    </Dialog>
 
     <Toast />
   </div>
@@ -274,16 +282,11 @@ import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
-import Dialog from 'primevue/dialog';
-import FullCalendar from '@fullcalendar/vue3';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import type { EventClickArg } from '@fullcalendar/core';
 import { useUserStore } from '@/store/user';
 import { useToast } from 'primevue/usetoast';
 import { UserRole } from '@/constants/user';
 import type { Visit, VisitStats } from '@/types/visit';
+import VisitsCalendar from './VisitsCalendar.vue';
 
 const userStore = useUserStore();
 const toast = useToast();
@@ -294,14 +297,12 @@ const users = ref<any[]>([]);
 const trainers = ref<any[]>([]);
 const stats = ref<VisitStats | null>(null);
 
-const showEventDialog = ref(false);
-const selectedVisit = ref<Visit | null>(null);
-const calendarRef = ref<InstanceType<typeof FullCalendar> | null>(null);
+const calendarRef = ref<InstanceType<typeof VisitsCalendar> | null>(null);
 
 const onTabChange = (value: string | number) => {
   if (value === 'calendar') {
     nextTick(() => {
-      calendarRef.value?.getApi().updateSize();
+      calendarRef.value?.updateSize();
     });
   }
 };
@@ -319,45 +320,11 @@ const filters = ref<{
 });
 
 const isAdmin = computed(() => userStore.currentUser?.role === UserRole.ADMIN);
-const isTrainer = computed(() => userStore.currentUser?.role === UserRole.TRAINER);
+const isTrainer = computed(
+  () => userStore.currentUser?.role === UserRole.TRAINER,
+);
 const isUser = computed(() => userStore.currentUser?.role === UserRole.USER);
 
-// Map visits to FullCalendar events
-const calendarEvents = computed(() =>
-  visits.value.map((v) => {
-    const label = isAdmin.value || isTrainer.value
-      ? v.userId?.email ?? 'Visit'
-      : v.trainerId?.email ?? 'Training';
-
-    const color = v.wasBalanceUsed ? '#3b82f6' : v.price ? '#10b981' : '#6b7280';
-
-    return {
-      id: v._id,
-      title: label,
-      start: v.date,
-      backgroundColor: color,
-      borderColor: color,
-      extendedProps: { visit: v },
-    };
-  }),
-);
-
-const calendarOptions = computed(() => ({
-  plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-  initialView: 'dayGridMonth',
-  headerToolbar: {
-    left: 'prev,next today',
-    center: 'title',
-    right: 'dayGridMonth,timeGridWeek,timeGridDay',
-  },
-  events: calendarEvents.value,
-  eventClick: (info: EventClickArg) => {
-    selectedVisit.value = info.event.extendedProps.visit as Visit;
-    showEventDialog.value = true;
-  },
-  height: 'auto',
-  locale: 'en',
-}));
 
 const loadVisits = async () => {
   loading.value = true;
@@ -370,7 +337,11 @@ const loadVisits = async () => {
     };
 
     if (isAdmin.value) {
-      params = { ...params, userId: filters.value.userId, trainerId: filters.value.trainerId };
+      params = {
+        ...params,
+        userId: filters.value.userId,
+        trainerId: filters.value.trainerId,
+      };
     } else if (isTrainer.value) {
       endpoint = `/visits/trainer/${userStore.currentUser?._id}`;
       params = { ...params, userId: filters.value.userId };
@@ -383,7 +354,12 @@ const loadVisits = async () => {
     visits.value = response.data.data || response.data;
   } catch (error) {
     console.error('Failed to load visits:', error);
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load visits', life: 3000 });
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to load visits',
+      life: 3000,
+    });
   } finally {
     loading.value = false;
   }
@@ -404,11 +380,15 @@ const loadStats = async () => {
 const loadFilterOptions = async () => {
   try {
     if (isAdmin.value || isTrainer.value) {
-      const usersResponse = await api.get('/users', { params: { role: UserRole.USER } });
+      const usersResponse = await api.get('/users', {
+        params: { role: UserRole.USER },
+      });
       users.value = usersResponse.data;
     }
     if (isAdmin.value || isUser.value) {
-      const trainersResponse = await api.get('/users', { params: { role: UserRole.TRAINER } });
+      const trainersResponse = await api.get('/users', {
+        params: { role: UserRole.TRAINER },
+      });
       trainers.value = trainersResponse.data;
     }
   } catch (error) {
@@ -417,21 +397,37 @@ const loadFilterOptions = async () => {
 };
 
 const clearFilters = () => {
-  filters.value = { userId: null, trainerId: null, dateFrom: null, dateTo: null };
+  filters.value = {
+    userId: null,
+    trainerId: null,
+    dateFrom: null,
+    dateTo: null,
+  };
 };
 
-watch(() => filters.value, () => { loadVisits(); }, { deep: true });
+watch(
+  () => filters.value,
+  () => {
+    loadVisits();
+  },
+  { deep: true },
+);
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   return date.toLocaleDateString('en-GB', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 };
 
 const formatPrice = (price: number) =>
-  new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(price);
+  new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(
+    price,
+  );
 
 onMounted(() => {
   loadVisits();
@@ -440,58 +436,94 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-.visits-table {
-  margin-top: 20px;
+<style scoped lang="postcss">
+/* ── Layout ── */
+.p-m-4 {
+  padding: 16px;
+
+  @media (max-width: 480px) {
+    padding: 10px;
+  }
 }
 
-.user-cell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
+/* ── Filters ── */
 .filters-section {
   margin-bottom: 20px;
-  padding: 20px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-}
+  padding: 16px 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 
-.filters-section h4 {
-  margin-top: 0;
-  margin-bottom: 15px;
+  & h4 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gym-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 }
 
 .filters-row {
   display: flex;
-  gap: 20px;
-  align-items: end;
+  gap: 12px;
+  align-items: flex-end;
   flex-wrap: wrap;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
 }
 
 .filter-item {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-}
+  gap: 4px;
 
-.filter-item label {
-  font-weight: 500;
-  font-size: 14px;
-  color: #374151;
+  @media (max-width: 600px) {
+    width: 100%;
+
+    :deep(.p-select),
+    :deep(.p-datepicker) {
+      width: 100% !important;
+    }
+  }
+
+  & label {
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--gym-text-muted);
+  }
 }
 
 .clear-filters-btn {
   height: 42px;
+
+  @media (max-width: 600px) {
+    width: 100%;
+  }
+}
+
+/* ── Table ── */
+.visits-table {
+  margin-top: 16px;
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 .loading-container {
@@ -508,7 +540,7 @@ onMounted(() => {
 
 .no-trainer,
 .no-notes {
-  color: #9ca3af;
+  color: var(--gym-text-muted);
   font-style: italic;
 }
 
@@ -522,74 +554,58 @@ onMounted(() => {
 .empty-state {
   text-align: center;
   padding: 40px;
-  color: #6b7280;
+  color: var(--gym-text-muted);
 }
 
+/* ── Stats ── */
 .stats-section {
-  margin-top: 30px;
-  padding: 20px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-}
+  margin-top: 24px;
+  padding: 16px 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 
-.stats-section h4 {
-  margin-top: 0;
-  margin-bottom: 15px;
+  & h4 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gym-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 }
 
 .stats-cards {
   display: flex;
-  gap: 20px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .stat-card {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 15px;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  min-width: 120px;
+  gap: 4px;
+  padding: 14px 18px;
+  background: var(--gym-surface);
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  flex: 1;
+  min-width: 110px;
+
+  & .stat-label {
+    font-size: 12px;
+    color: var(--gym-text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  & .stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gym-dark);
+  }
 }
 
-.stat-label {
-  font-size: 14px;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.stat-value {
-  font-size: 24px;
-  font-weight: 700;
-  color: #374151;
-}
-
-/* Calendar */
-.calendar-wrapper {
-  margin-top: 16px;
-}
-
-/* Event detail dialog */
-.event-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.event-detail-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.event-detail-label {
-  width: 80px;
-  font-weight: 600;
-  color: #6b7280;
-  font-size: 14px;
-  flex-shrink: 0;
-}
 </style>

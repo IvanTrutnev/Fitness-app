@@ -1,9 +1,5 @@
 <template>
   <div class="profile-container">
-    <div class="profile-header">
-      <h2>Profile</h2>
-    </div>
-
     <div class="profile-content" v-if="currentUser">
       <div class="user-info">
         <div @click="triggerFileUpload" class="avatar-clickable avatar-section">
@@ -278,19 +274,23 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="postcss">
 .profile-container {
   padding: 20px;
   max-width: 600px;
   margin: 0 auto;
+
+  @media (max-width: 480px) {
+    padding: 12px;
+  }
 }
 
 .profile-header {
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
 
 .profile-content {
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
 
 .user-info {
@@ -298,9 +298,18 @@ onMounted(() => {
   gap: 20px;
   align-items: center;
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    padding: 16px;
+  }
 }
 
 .avatar-section {
@@ -310,10 +319,10 @@ onMounted(() => {
 .avatar-clickable {
   cursor: pointer;
   transition: opacity 0.2s;
-}
 
-.avatar-clickable:hover {
-  opacity: 0.8;
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
 .user-avatar {
@@ -321,7 +330,7 @@ onMounted(() => {
   height: 80px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #007bff;
+  border: 3px solid var(--gym-accent);
 }
 
 .no-avatar {
@@ -333,38 +342,52 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 3px solid #6c757d;
+  border: 3px solid var(--gym-text-muted);
   font-size: 10px;
-  color: #6c757d;
+  color: var(--gym-text-muted);
   text-align: center;
   gap: 5px;
 }
 
 .user-details {
   flex: 1;
-}
+  min-width: 0;
 
-.user-details p {
-  margin: 8px 0;
-  font-size: 16px;
+  & p {
+    margin: 8px 0;
+    font-size: 15px;
+    word-break: break-word;
+    color: var(--gym-dark);
+
+    @media (max-width: 480px) {
+      font-size: 14px;
+    }
+  }
 }
 
 .documents-section {
-  margin-top: 30px;
+  margin-top: 24px;
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-}
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
-.documents-section h3 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  color: #333;
+  @media (max-width: 480px) {
+    padding: 14px;
+  }
+
+  & h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: var(--gym-dark);
+    font-size: 16px;
+    font-weight: 600;
+  }
 }
 
 .upload-section {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .upload-btn {
@@ -374,60 +397,74 @@ onMounted(() => {
 .documents-list {
   max-height: 400px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .document-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
-  margin-bottom: 8px;
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  padding: 10px 12px;
+  background: var(--gym-surface);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   transition: box-shadow 0.2s;
-}
+  gap: 8px;
 
-.document-item:hover {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  &:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
 }
 
 .document-info {
   display: flex;
   align-items: center;
   flex: 1;
+  min-width: 0;
 }
 
 .document-icon {
-  font-size: 1.5rem;
-  margin-right: 12px;
-  color: #007bff;
+  font-size: 1.4rem;
+  margin-right: 10px;
+  flex-shrink: 0;
+  color: var(--gym-accent);
 }
 
 .document-details {
   flex: 1;
+  min-width: 0;
 }
 
 .document-name {
   margin: 0;
   font-weight: 500;
-  color: #333;
+  color: var(--gym-dark);
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .document-meta {
-  color: #666;
-  margin-top: 4px;
+  color: var(--gym-text-muted);
+  font-size: 12px;
+  margin-top: 2px;
+  display: block;
 }
 
 .document-actions {
   display: flex;
-  gap: 8px;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .no-documents {
   text-align: center;
-  color: #666;
+  color: var(--gym-text-muted);
   margin: 20px 0;
   font-style: italic;
+  font-size: 14px;
 }
 </style>

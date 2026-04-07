@@ -1,16 +1,30 @@
 <template>
-  <div>
+  <div class="app-shell">
     <header class="app-header">
-      <Menu :model="menuItems" popup ref="menu" />
-      <Button
-        class="logout-btn"
-        severity="secondary"
-        icon="pi pi-user"
-        label="Account"
-        @click="toggleMenu"
-      />
+      <div class="header-brand">
+        <span class="brand-icon">
+          <i class="pi pi-bolt" />
+        </span>
+        <span class="brand-name">FitClub</span>
+      </div>
+
+      <div class="header-actions">
+        <span v-if="userStore.currentUser" class="user-greeting">
+          {{ userStore.currentUser.name || userStore.currentUser.email }}
+        </span>
+        <Menu :model="menuItems" popup ref="menu" />
+        <Button
+          class="account-btn"
+          severity="contrast"
+          icon="pi pi-user"
+          label="Account"
+          @click="toggleMenu"
+          rounded
+        />
+      </div>
     </header>
-    <main>
+
+    <main class="app-main">
       <router-view />
     </main>
   </div>
@@ -76,24 +90,80 @@ function toggleMenu(event: Event) {
 </script>
 
 <style scoped>
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .app-header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
+  padding: 0 24px;
+  height: 60px;
+  background: var(--gym-dark);
+  box-shadow: 0 2px 12px rgba(30, 27, 75, 0.5);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: var(--gym-accent);
+  border-radius: 8px;
   color: white;
+  font-size: 16px;
 }
 
-.logo {
-  margin: 0;
+.brand-name {
   font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.5px;
 }
 
-main {
-  padding: 20px;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.logout-btn {
-  margin-left: 10px;
+.user-greeting {
+  color: #a5b4fc;
+  font-size: 14px;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-btn {
+  background: var(--gym-dark-secondary) !important;
+  border-color: #4338ca !important;
+  color: #e0e7ff !important;
+}
+
+.account-btn:hover {
+  background: var(--gym-accent) !important;
+  border-color: var(--gym-accent) !important;
+  color: #fff !important;
+}
+
+.app-main {
+  flex: 1;
+  padding: 24px;
 }
 </style>
