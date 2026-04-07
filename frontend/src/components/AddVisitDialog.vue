@@ -3,31 +3,31 @@
     :visible="visible"
     @update:visible="$emit('update:visible', $event)"
     modal
-    header="Add Visit"
+    :header="t('addVisit.header')"
     :closable="false"
     :style="{ width: '500px', minWidth: '300px' }"
   >
     <form @submit.prevent="handleSubmit" class="visit-form">
       <div class="form-row">
-        <label for="user">User*</label>
+        <label for="user">{{ t('addVisit.user') }}</label>
         <span>{{ userEmail }}</span>
       </div>
 
       <div class="form-row">
-        <label for="trainer">Trainer</label>
+        <label for="trainer">{{ t('addVisit.trainer') }}</label>
         <Select
           v-model="form.trainerId"
           :options="trainers"
           optionLabel="email"
           optionValue="_id"
-          placeholder="Select trainer (optional)"
+          :placeholder="t('addVisit.trainerPlaceholder')"
           :disabled="loading"
           style="width: 100%"
         />
       </div>
 
       <div class="form-row">
-        <label for="date">Date*</label>
+        <label for="date">{{ t('addVisit.date') }}</label>
         <DatePicker
           v-model="form.date"
           dateFormat="dd/mm/yy"
@@ -38,7 +38,7 @@
       </div>
 
       <div class="form-row">
-        <label for="price">Price (₽)</label>
+        <label for="price">{{ t('addVisit.price') }}</label>
         <InputNumber
           v-model="form.price"
           :disabled="loading"
@@ -51,7 +51,7 @@
       </div>
 
       <div class="form-row">
-        <label for="notes">Notes</label>
+        <label for="notes">{{ t('addVisit.notes') }}</label>
         <Textarea
           v-model="form.notes"
           :disabled="loading"
@@ -67,24 +67,24 @@
           binary
         />
         <label for="useBalance" class="checkbox-label">
-          Use balance
+          {{ t('addVisit.useBalance') }}
           <span v-if="user?.activeBalance" class="balance-info">
-            (available: {{ user.activeBalance.visits }} visits)
+            {{ t('addVisit.availableVisits', { n: user.activeBalance.visits }) }}
           </span>
-          <span v-else class="no-balance">(no balance)</span>
+          <span v-else class="no-balance">{{ t('addVisit.noBalance') }}</span>
         </label>
       </div>
 
       <div class="form-actions">
         <Button
-          label="Cancel"
+          :label="t('addVisit.cancel')"
           icon="pi pi-times"
           text
           @click="handleCancel"
           :disabled="loading"
         />
         <Button
-          label="Add Visit"
+          :label="t('addVisit.submit')"
           icon="pi pi-check"
           type="submit"
           :loading="loading"
@@ -106,6 +106,9 @@ import Checkbox from 'primevue/checkbox';
 import api from '@/lib/api';
 import { UserRole } from '@/constants/user';
 import type { VisitForm } from '@/types/visit';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 interface Props {
   visible: boolean;

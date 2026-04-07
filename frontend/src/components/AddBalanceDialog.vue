@@ -2,14 +2,14 @@
   <Dialog
     :visible="visible"
     :style="{ width: '500px' }"
-    header="Add Balance"
+    :header="t('addBalance.header')"
     :modal="true"
     class="p-fluid"
     @update:visible="$emit('update:visible', $event)"
   >
     <div class="dialog-content">
       <div class="field">
-        <label for="user" class="field-label">User</label>
+        <label for="user" class="field-label">{{ t('addBalance.user') }}</label>
         <div class="user-info">
           <img
             v-if="user?.avatarUrl"
@@ -22,36 +22,36 @@
       </div>
 
       <div class="field">
-        <label for="visits" class="field-label required">Visits</label>
+        <label for="visits" class="field-label required">{{ t('addBalance.visits') }}</label>
         <InputNumber
           class="w-full"
           id="visits"
           v-model="form.visits"
           :min="1"
           :max="100"
-          placeholder="Number of visits"
+          :placeholder="t('addBalance.visitsPlaceholder')"
           :invalid="!form.visits || form.visits <= 0"
         />
-        <small class="field-help">Number of gym visits to add</small>
+        <small class="field-help">{{ t('addBalance.visitsHelp') }}</small>
       </div>
 
       <div class="field">
-        <label for="dueDate" class="field-label required">Due Date</label>
+        <label for="dueDate" class="field-label required">{{ t('addBalance.dueDate') }}</label>
         <Calendar
           id="dueDate"
           v-model="form.dueDate"
           :minDate="new Date()"
           dateFormat="dd/mm/yy"
           :showIcon="true"
-          placeholder="Select expiration date"
+          :placeholder="t('addBalance.dueDatePlaceholder')"
           class="w-full"
           :invalid="!form.dueDate"
         />
-        <small class="field-help">When the balance expires</small>
+        <small class="field-help">{{ t('addBalance.dueDateHelp') }}</small>
       </div>
 
       <div class="field">
-        <label for="price" class="field-label">Price (optional)</label>
+        <label for="price" class="field-label">{{ t('addBalance.price') }}</label>
         <InputNumber
           id="price"
           v-model="form.price"
@@ -61,35 +61,33 @@
           placeholder="0.00"
           class="w-full"
         />
-        <small class="field-help">Cost of the balance package</small>
+        <small class="field-help">{{ t('addBalance.priceHelp') }}</small>
       </div>
 
       <div class="field">
-        <label for="notes" class="field-label">Notes (optional)</label>
+        <label for="notes" class="field-label">{{ t('addBalance.notes') }}</label>
         <Textarea
           id="notes"
           v-model="form.notes"
-          placeholder="Additional notes or comments..."
+          :placeholder="t('addBalance.notesPlaceholder')"
           :rows="3"
           :maxlength="200"
           class="w-full"
         />
-        <small class="field-help"
-          >{{ form.notes?.length || 0 }}/200 characters</small
-        >
+        <small class="field-help">{{ form.notes?.length || 0 }}/200 characters</small>
       </div>
     </div>
 
     <template #footer>
       <div class="dialog-footer">
         <Button
-          label="Cancel"
+          :label="t('addBalance.cancel')"
           icon="pi pi-times"
           @click="$emit('update:visible', false)"
           class="p-button-text"
         />
         <Button
-          label="Add Balance"
+          :label="t('addBalance.submit')"
           icon="pi pi-check"
           @click="submitBalance"
           :loading="loading"
@@ -108,6 +106,9 @@ import InputNumber from 'primevue/inputnumber';
 import Calendar from 'primevue/calendar';
 import Textarea from 'primevue/textarea';
 import type { BalanceForm } from '@/types/balance';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 interface Props {
   visible: boolean;
@@ -128,7 +129,7 @@ const emit = defineEmits<Emits>();
 
 const form = ref<BalanceForm>({
   visits: 10,
-  dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // +30 days
+  dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
   price: null,
   notes: '',
 });
@@ -152,7 +153,6 @@ const submitBalance = () => {
   }
 };
 
-// Reset form when dialog opens
 watch(
   () => props.visible,
   (newValue) => {
@@ -220,7 +220,6 @@ watch(
   padding: 0;
 }
 
-/* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .user-info {
     background: var(--surface-800);

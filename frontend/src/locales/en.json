@@ -1,0 +1,221 @@
+{
+  "nav": {
+    "account": "Account",
+    "profile": "Profile",
+    "visits": "Visits",
+    "settings": "Settings",
+    "users": "Users",
+    "logout": "Logout"
+  },
+  "login": {
+    "heroTitle1": "Train Hard.",
+    "heroTitle2": "Track Smart.",
+    "heroSubtitle": "Manage your gym, members and visits all in one place.",
+    "title": "Welcome back",
+    "subtitle": "Sign in to your account",
+    "identifier": "Email or Phone",
+    "password": "Password",
+    "signIn": "Sign In",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Register here",
+    "failed": "Login failed",
+    "invalidCredentials": "Invalid email or password"
+  },
+  "register": {
+    "heroTitle1": "Join the Club.",
+    "heroTitle2": "Start Your Journey.",
+    "heroSubtitle": "Create your account and get access to everything your gym has to offer.",
+    "perk1": "Track your visits and progress",
+    "perk2": "Manage your membership balance",
+    "perk3": "Access your documents and history",
+    "title": "Create account",
+    "subtitle": "Fill in your details to get started",
+    "identifier": "Email or Phone",
+    "password": "Password",
+    "createAccount": "Create Account",
+    "hasAccount": "Already have an account?",
+    "signInLink": "Sign in here",
+    "failed": "Registration failed",
+    "failedDetail": "Registration failed. Please try again."
+  },
+  "visits": {
+    "tabs": {
+      "table": "Table",
+      "calendar": "Calendar"
+    },
+    "filters": {
+      "title": "Filters:",
+      "user": "User:",
+      "trainer": "Trainer:",
+      "dateFrom": "Date From:",
+      "dateTo": "Date To:",
+      "allUsers": "All users",
+      "allTrainers": "All trainers",
+      "clear": "Clear"
+    },
+    "columns": {
+      "user": "User",
+      "trainer": "Trainer",
+      "date": "Date",
+      "price": "Price",
+      "notes": "Notes",
+      "payment": "Payment"
+    },
+    "noTrainer": "No trainer",
+    "balance": "Balance",
+    "free": "Free",
+    "fromBalance": "From Balance",
+    "paid": "Paid {price}",
+    "empty": "No visits found",
+    "stats": {
+      "title": "Statistics",
+      "totalVisits": "Total Visits",
+      "balanceVisits": "Balance Visits",
+      "paidVisits": "Paid Visits",
+      "revenue": "Revenue"
+    },
+    "error": {
+      "load": "Failed to load visits",
+      "title": "Error"
+    }
+  },
+  "calendar": {
+    "visitDetails": "Visit Details",
+    "date": "Date",
+    "user": "User",
+    "trainer": "Trainer",
+    "payment": "Payment",
+    "notes": "Notes",
+    "noTrainer": "No trainer",
+    "balance": "Balance",
+    "free": "Free",
+    "visit": "Visit",
+    "training": "Training"
+  },
+  "users": {
+    "title": "Users",
+    "filterByRole": "Filter by Role:",
+    "allRoles": "All (Users & Trainers)",
+    "clearFilter": "Clear Filter",
+    "columns": {
+      "id": "ID",
+      "email": "Email",
+      "role": "Role",
+      "balance": "Balance",
+      "avatar": "Avatar",
+      "actions": "Actions"
+    },
+    "visitsCount": "{n} visits",
+    "expired": "Expired",
+    "addBalance": "Add Balance",
+    "addVisit": "Add Visit",
+    "roleUser": "User",
+    "roleTrainer": "Trainer",
+    "toast": {
+      "balanceAdded": "Balance added to {email}",
+      "visitAdded": "Visit added for {email}",
+      "balanceError": "Failed to add balance",
+      "visitError": "Failed to add visit"
+    }
+  },
+  "user": {
+    "backToUsers": "Back to Users",
+    "loading": "Loading user...",
+    "accountDetails": "Account Details",
+    "membership": "Membership",
+    "labels": {
+      "id": "ID",
+      "email": "Email",
+      "username": "Username",
+      "phone": "Phone",
+      "purchaseDate": "Purchase date",
+      "expires": "Expires"
+    },
+    "visitsRemaining": "visits remaining",
+    "membershipExpired": "Membership expired",
+    "noMembership": "No active membership",
+    "error": "Failed to load user"
+  },
+  "profile": {
+    "clickToUpload": "Click to upload",
+    "labels": {
+      "email": "Email:",
+      "username": "Username:",
+      "phone": "Phone:",
+      "id": "ID:",
+      "balance": "Balance:"
+    },
+    "notSet": "Not set",
+    "noBalance": "No active balance",
+    "documents": "Documents",
+    "uploading": "Uploading...",
+    "uploadDocument": "Upload Document",
+    "noDocuments": "No documents uploaded yet.",
+    "toast": {
+      "avatarSuccess": "Avatar updated successfully",
+      "avatarError": "Failed to upload avatar",
+      "docSuccess": "Document uploaded successfully",
+      "docError": "Failed to upload document",
+      "docDeleteSuccess": "Document deleted successfully",
+      "docDeleteError": "Failed to delete document",
+      "docLoadError": "Failed to load documents"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "profileInfo": "Profile Information",
+    "labels": {
+      "avatar": "Avatar",
+      "username": "Username",
+      "phone": "Phone Number",
+      "email": "Email"
+    },
+    "placeholders": {
+      "username": "Enter username",
+      "phone": "Enter phone number"
+    },
+    "emailHelp": "Email cannot be changed",
+    "clickToUpload": "Click to upload",
+    "saveChanges": "Save Changes",
+    "toast": {
+      "avatarSuccess": "Avatar updated successfully",
+      "avatarError": "Failed to upload avatar",
+      "settingsSuccess": "Settings updated successfully",
+      "settingsError": "Failed to update settings"
+    }
+  },
+  "addBalance": {
+    "header": "Add Balance",
+    "user": "User",
+    "visits": "Visits",
+    "visitsPlaceholder": "Number of visits",
+    "visitsHelp": "Number of gym visits to add",
+    "dueDate": "Due Date",
+    "dueDatePlaceholder": "Select expiration date",
+    "dueDateHelp": "When the balance expires",
+    "price": "Price (optional)",
+    "priceHelp": "Cost of the balance package",
+    "notes": "Notes (optional)",
+    "notesPlaceholder": "Additional notes or comments...",
+    "cancel": "Cancel",
+    "submit": "Add Balance"
+  },
+  "addVisit": {
+    "header": "Add Visit",
+    "user": "User*",
+    "trainer": "Trainer",
+    "trainerPlaceholder": "Select trainer (optional)",
+    "date": "Date*",
+    "price": "Price (₽)",
+    "notes": "Notes",
+    "useBalance": "Use balance",
+    "availableVisits": "(available: {n} visits)",
+    "noBalance": "(no balance)",
+    "cancel": "Cancel",
+    "submit": "Add Visit"
+  },
+  "common": {
+    "success": "Success",
+    "error": "Error"
+  }
+}

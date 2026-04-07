@@ -1,22 +1,21 @@
 <template>
   <div class="p-m-4">
-    <h2>Users</h2>
+    <h2>{{ t('users.title') }}</h2>
 
-    <!-- Фильтры -->
     <div class="filters-section">
-      <h4>Filter by Role:</h4>
+      <h4>{{ t('users.filterByRole') }}</h4>
       <div class="role-filters">
         <Dropdown
           v-model="selectedRole"
           :options="roleOptions"
           optionLabel="label"
           optionValue="value"
-          placeholder="All (Users & Trainers)"
+          :placeholder="t('users.allRoles')"
           @change="loadUsers"
           style="width: 200px"
         />
         <Button
-          label="Clear Filter"
+          :label="t('users.clearFilter')"
           @click="clearFilter"
           outlined
           size="small"
@@ -32,17 +31,17 @@
       @rowClick="onRowClick"
       style="cursor: pointer"
     >
-      <Column field="_id" header="ID"></Column>
-      <Column field="email" header="Email"></Column>
-      <Column field="role" header="Role">
+      <Column field="_id" :header="t('users.columns.id')"></Column>
+      <Column field="email" :header="t('users.columns.email')"></Column>
+      <Column field="role" :header="t('users.columns.role')">
         <template #body="{ data }">
           <Tag :value="data.role" :severity="getRoleSeverity(data.role)" />
         </template>
       </Column>
-      <Column header="Balance">
+      <Column :header="t('users.columns.balance')">
         <template #body="{ data }">
           <div v-if="data.activeBalance" class="balance-info">
-            <div class="visits">{{ data.activeBalance.visits }} visits</div>
+            <div class="visits">{{ t('users.visitsCount', { n: data.activeBalance.visits }) }}</div>
             <div
               class="due-date"
               :class="{ expired: data.activeBalance.isExpired }"
@@ -51,7 +50,7 @@
             </div>
             <Tag
               v-if="data.activeBalance.isExpired"
-              value="Expired"
+              :value="t('users.expired')"
               severity="danger"
               size="small"
             />
@@ -59,7 +58,7 @@
           <span v-else class="no-balance">-</span>
         </template>
       </Column>
-      <Column header="Avatar">
+      <Column :header="t('users.columns.avatar')">
         <template #body="{ data }">
           <img
             v-if="data.avatarUrl"
@@ -69,13 +68,13 @@
           />
         </template>
       </Column>
-      <Column header="Actions" v-if="isAdmin">
+      <Column :header="t('users.columns.actions')" v-if="isAdmin">
         <template #body="{ data }">
           <div class="actions-buttons">
             <Button
               v-if="data.role === UserRole.USER"
               icon="pi pi-plus"
-              label="Add Balance"
+              :label="t('users.addBalance')"
               size="small"
               outlined
               @click.stop="openAddBalanceDialog(data)"
@@ -83,7 +82,7 @@
             <Button
               v-if="data.role === UserRole.USER"
               icon="pi pi-calendar-plus"
-              label="Add Visit"
+              :label="t('users.addVisit')"
               size="small"
               outlined
               severity="secondary"
@@ -94,7 +93,6 @@
       </Column>
     </DataTable>
 
-    <!-- Add Balance Dialog -->
     <AddBalanceDialog
       v-model:visible="showBalanceDialog"
       :user="selectedUser"
@@ -102,7 +100,6 @@
       @submit="submitBalance"
     />
 
-    <!-- Add Visit Dialog -->
     <AddVisitDialog
       v-model:visible="showVisitDialog"
       :user="selectedUserForVisit"
@@ -131,6 +128,9 @@ import { useUserStore } from '@/store/user';
 import { useToast } from 'primevue/usetoast';
 import type { BalanceForm } from '@/types/balance';
 import type { VisitForm } from '@/types/visit';
+import { useI18n } from 'vue-i18n';
+
+const { t, locale } = useI18n();
 
 const users = ref([]);
 const selectedRole = ref<string | null>(null);
@@ -138,12 +138,10 @@ const router = useRouter();
 const userStore = useUserStore();
 const toast = useToast();
 
-// Balance dialog state
 const showBalanceDialog = ref(false);
 const selectedUser = ref<any>(null);
 const isSubmittingBalance = ref(false);
 
-// Visit dialog state
 const showVisitDialog = ref(false);
 const selectedUserForVisit = ref<any>(null);
 const isSubmittingVisit = ref(false);
@@ -152,10 +150,10 @@ const isAdmin = computed(() => {
   return userStore.currentUser?.role === UserRole.ADMIN;
 });
 
-const roleOptions = [
-  { label: 'User', value: UserRole.USER },
-  { label: 'Trainer', value: UserRole.TRAINER },
-];
+const roleOptions = computed(() => [
+  { label: t('users.roleUser'), value: UserRole.USER },
+  { label: t('users.roleTrainer'), value: UserRole.TRAINER },
+]);
 
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 
@@ -203,9 +201,11 @@ const getRoleSeverity = (role: string) => {
   }
 };
 
+const dateLocale = computed(() => locale.value === 'ru' ? 'ru-RU' : 'en-GB');
+
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-GB', {
+  return date.toLocaleDateString(dateLocale.value, {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -238,20 +238,19 @@ const submitBalance = async (form: BalanceForm) => {
 
     toast.add({
       severity: 'success',
-      summary: 'Success',
-      detail: `Balance added to ${selectedUser.value.email}`,
+      summary: t('common.success'),
+      detail: t('users.toast.balanceAdded', { email: selectedUser.value.email }),
       life: 3000,
     });
 
     showBalanceDialog.value = false;
-    // Reload users list to show updated balance
     loadUsers();
   } catch (error) {
     console.error('Failed to add balance:', error);
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to add balance',
+      summary: t('common.error'),
+      detail: t('users.toast.balanceError'),
       life: 3000,
     });
   } finally {
@@ -276,13 +275,12 @@ const submitVisit = async (form: VisitForm) => {
 
     toast.add({
       severity: 'success',
-      summary: 'Success',
-      detail: `Visit added for ${selectedUserForVisit.value.email}`,
+      summary: t('common.success'),
+      detail: t('users.toast.visitAdded', { email: selectedUserForVisit.value.email }),
       life: 3000,
     });
 
     showVisitDialog.value = false;
-    // Reload users list to show updated balance if balance was used
     if (form.useBalance) {
       loadUsers();
     }
@@ -290,8 +288,8 @@ const submitVisit = async (form: VisitForm) => {
     console.error('Failed to add visit:', error);
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to add visit',
+      summary: t('common.error'),
+      detail: t('users.toast.visitError'),
       life: 3000,
     });
   } finally {

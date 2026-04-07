@@ -1,0 +1,221 @@
+{
+  "nav": {
+    "account": "Аккаунт",
+    "profile": "Профиль",
+    "visits": "Посещения",
+    "settings": "Настройки",
+    "users": "Пользователи",
+    "logout": "Выйти"
+  },
+  "login": {
+    "heroTitle1": "Тренируйся.",
+    "heroTitle2": "Следи за прогрессом.",
+    "heroSubtitle": "Управляйте залом, участниками и посещениями в одном месте.",
+    "title": "С возвращением",
+    "subtitle": "Войдите в свой аккаунт",
+    "identifier": "Email или телефон",
+    "password": "Пароль",
+    "signIn": "Войти",
+    "noAccount": "Нет аккаунта?",
+    "registerLink": "Зарегистрируйтесь",
+    "failed": "Ошибка входа",
+    "invalidCredentials": "Неверный email или пароль"
+  },
+  "register": {
+    "heroTitle1": "Присоединяйтесь.",
+    "heroTitle2": "Начните свой путь.",
+    "heroSubtitle": "Создайте аккаунт и получите доступ ко всему, что предлагает ваш зал.",
+    "perk1": "Отслеживайте посещения и прогресс",
+    "perk2": "Управляйте балансом абонемента",
+    "perk3": "Доступ к документам и истории",
+    "title": "Создать аккаунт",
+    "subtitle": "Заполните данные для начала",
+    "identifier": "Email или телефон",
+    "password": "Пароль",
+    "createAccount": "Создать аккаунт",
+    "hasAccount": "Уже есть аккаунт?",
+    "signInLink": "Войти",
+    "failed": "Ошибка регистрации",
+    "failedDetail": "Регистрация не удалась. Попробуйте ещё раз."
+  },
+  "visits": {
+    "tabs": {
+      "table": "Таблица",
+      "calendar": "Календарь"
+    },
+    "filters": {
+      "title": "Фильтры:",
+      "user": "Пользователь:",
+      "trainer": "Тренер:",
+      "dateFrom": "Дата с:",
+      "dateTo": "Дата по:",
+      "allUsers": "Все пользователи",
+      "allTrainers": "Все тренеры",
+      "clear": "Сбросить"
+    },
+    "columns": {
+      "user": "Пользователь",
+      "trainer": "Тренер",
+      "date": "Дата",
+      "price": "Стоимость",
+      "notes": "Заметки",
+      "payment": "Оплата"
+    },
+    "noTrainer": "Без тренера",
+    "balance": "Баланс",
+    "free": "Бесплатно",
+    "fromBalance": "С баланса",
+    "paid": "Оплачено {price}",
+    "empty": "Посещения не найдены",
+    "stats": {
+      "title": "Статистика",
+      "totalVisits": "Всего посещений",
+      "balanceVisits": "По балансу",
+      "paidVisits": "Оплаченных",
+      "revenue": "Выручка"
+    },
+    "error": {
+      "load": "Не удалось загрузить посещения",
+      "title": "Ошибка"
+    }
+  },
+  "calendar": {
+    "visitDetails": "Детали посещения",
+    "date": "Дата",
+    "user": "Пользователь",
+    "trainer": "Тренер",
+    "payment": "Оплата",
+    "notes": "Заметки",
+    "noTrainer": "Без тренера",
+    "balance": "Баланс",
+    "free": "Бесплатно",
+    "visit": "Посещение",
+    "training": "Тренировка"
+  },
+  "users": {
+    "title": "Пользователи",
+    "filterByRole": "Фильтр по роли:",
+    "allRoles": "Все (пользователи и тренеры)",
+    "clearFilter": "Сбросить фильтр",
+    "columns": {
+      "id": "ID",
+      "email": "Email",
+      "role": "Роль",
+      "balance": "Баланс",
+      "avatar": "Аватар",
+      "actions": "Действия"
+    },
+    "visitsCount": "{n} посещений",
+    "expired": "Истёк",
+    "addBalance": "Добавить баланс",
+    "addVisit": "Добавить посещение",
+    "roleUser": "Пользователь",
+    "roleTrainer": "Тренер",
+    "toast": {
+      "balanceAdded": "Баланс добавлен для {email}",
+      "visitAdded": "Посещение добавлено для {email}",
+      "balanceError": "Не удалось добавить баланс",
+      "visitError": "Не удалось добавить посещение"
+    }
+  },
+  "user": {
+    "backToUsers": "Назад к пользователям",
+    "loading": "Загрузка...",
+    "accountDetails": "Данные аккаунта",
+    "membership": "Абонемент",
+    "labels": {
+      "id": "ID",
+      "email": "Email",
+      "username": "Имя пользователя",
+      "phone": "Телефон",
+      "purchaseDate": "Дата покупки",
+      "expires": "Истекает"
+    },
+    "visitsRemaining": "посещений осталось",
+    "membershipExpired": "Абонемент истёк",
+    "noMembership": "Нет активного абонемента",
+    "error": "Не удалось загрузить пользователя"
+  },
+  "profile": {
+    "clickToUpload": "Нажмите для загрузки",
+    "labels": {
+      "email": "Email:",
+      "username": "Имя:",
+      "phone": "Телефон:",
+      "id": "ID:",
+      "balance": "Баланс:"
+    },
+    "notSet": "Не задано",
+    "noBalance": "Нет активного баланса",
+    "documents": "Документы",
+    "uploading": "Загрузка...",
+    "uploadDocument": "Загрузить документ",
+    "noDocuments": "Документы ещё не загружены.",
+    "toast": {
+      "avatarSuccess": "Аватар успешно обновлён",
+      "avatarError": "Не удалось загрузить аватар",
+      "docSuccess": "Документ успешно загружен",
+      "docError": "Не удалось загрузить документ",
+      "docDeleteSuccess": "Документ успешно удалён",
+      "docDeleteError": "Не удалось удалить документ",
+      "docLoadError": "Не удалось загрузить документы"
+    }
+  },
+  "settings": {
+    "title": "Настройки",
+    "profileInfo": "Информация профиля",
+    "labels": {
+      "avatar": "Аватар",
+      "username": "Имя пользователя",
+      "phone": "Номер телефона",
+      "email": "Email"
+    },
+    "placeholders": {
+      "username": "Введите имя пользователя",
+      "phone": "Введите номер телефона"
+    },
+    "emailHelp": "Email нельзя изменить",
+    "clickToUpload": "Нажмите для загрузки",
+    "saveChanges": "Сохранить изменения",
+    "toast": {
+      "avatarSuccess": "Аватар успешно обновлён",
+      "avatarError": "Не удалось загрузить аватар",
+      "settingsSuccess": "Настройки успешно сохранены",
+      "settingsError": "Не удалось сохранить настройки"
+    }
+  },
+  "addBalance": {
+    "header": "Добавить баланс",
+    "user": "Пользователь",
+    "visits": "Посещения",
+    "visitsPlaceholder": "Количество посещений",
+    "visitsHelp": "Число посещений зала для добавления",
+    "dueDate": "Дата истечения",
+    "dueDatePlaceholder": "Выберите дату истечения",
+    "dueDateHelp": "Когда истекает баланс",
+    "price": "Стоимость (опционально)",
+    "priceHelp": "Стоимость пакета посещений",
+    "notes": "Заметки (опционально)",
+    "notesPlaceholder": "Дополнительные заметки или комментарии...",
+    "cancel": "Отмена",
+    "submit": "Добавить баланс"
+  },
+  "addVisit": {
+    "header": "Добавить посещение",
+    "user": "Пользователь*",
+    "trainer": "Тренер",
+    "trainerPlaceholder": "Выберите тренера (необязательно)",
+    "date": "Дата*",
+    "price": "Стоимость (₽)",
+    "notes": "Заметки",
+    "useBalance": "Использовать баланс",
+    "availableVisits": "(доступно: {n} посещений)",
+    "noBalance": "(нет баланса)",
+    "cancel": "Отмена",
+    "submit": "Добавить посещение"
+  },
+  "common": {
+    "success": "Успешно",
+    "error": "Ошибка"
+  }
+}

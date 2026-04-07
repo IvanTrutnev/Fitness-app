@@ -4,7 +4,7 @@
     <div class="page-nav">
       <Button
         icon="pi pi-arrow-left"
-        label="Back to Users"
+        :label="t('user.backToUsers')"
         severity="secondary"
         text
         @click="router.push({ name: 'Users' })"
@@ -14,7 +14,7 @@
     <!-- Loading / error states -->
     <div v-if="loading" class="state-wrapper">
       <ProgressSpinner />
-      <p class="state-text">Loading user...</p>
+      <p class="state-text">{{ t('user.loading') }}</p>
     </div>
 
     <div v-else-if="error" class="state-wrapper">
@@ -59,23 +59,23 @@
         <div class="info-card">
           <div class="info-card-header">
             <i class="pi pi-id-card" />
-            <span>Account Details</span>
+            <span>{{ t('user.accountDetails') }}</span>
           </div>
           <div class="info-rows">
             <div class="info-row">
-              <span class="info-label">ID</span>
+              <span class="info-label">{{ t('user.labels.id') }}</span>
               <span class="info-value info-value--mono">{{ user._id }}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">Email</span>
+              <span class="info-label">{{ t('user.labels.email') }}</span>
               <span class="info-value">{{ user.email }}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">Username</span>
+              <span class="info-label">{{ t('user.labels.username') }}</span>
               <span class="info-value">{{ user.username || '—' }}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">Phone</span>
+              <span class="info-label">{{ t('user.labels.phone') }}</span>
               <span class="info-value">{{ user.phone || '—' }}</span>
             </div>
           </div>
@@ -85,7 +85,7 @@
         <div class="info-card" v-if="user.role === UserRole.USER">
           <div class="info-card-header">
             <i class="pi pi-wallet" />
-            <span>Membership</span>
+            <span>{{ t('user.membership') }}</span>
           </div>
 
           <div
@@ -94,18 +94,18 @@
           >
             <div class="balance-visits">
               <span class="balance-count">{{ user.activeBalance.visits }}</span>
-              <span class="balance-label">visits remaining</span>
+              <span class="balance-label">{{ t('user.visitsRemaining') }}</span>
             </div>
             <Divider />
             <div class="info-rows">
               <div class="info-row">
-                <span class="info-label">Purchase date</span>
+                <span class="info-label">{{ t('user.labels.purchaseDate') }}</span>
                 <span class="info-value">{{
                   formatDate(user.activeBalance.purchaseDate)
                 }}</span>
               </div>
               <div class="info-row">
-                <span class="info-label">Expires</span>
+                <span class="info-label">{{ t('user.labels.expires') }}</span>
                 <span class="info-value">{{
                   formatDate(user.activeBalance.dueDate)
                 }}</span>
@@ -118,12 +118,12 @@
             class="balance-state balance-state--expired"
           >
             <i class="pi pi-clock" />
-            <span>Membership expired</span>
+            <span>{{ t('user.membershipExpired') }}</span>
           </div>
 
           <div v-else class="balance-state balance-state--none">
             <i class="pi pi-ban" />
-            <span>No active membership</span>
+            <span>{{ t('user.noMembership') }}</span>
           </div>
         </div>
       </div>
@@ -141,7 +141,9 @@ import Divider from 'primevue/divider';
 import ProgressSpinner from 'primevue/progressspinner';
 import { UserRole } from '@/constants/user';
 import type { UserWithBalance } from '@/types/user';
+import { useI18n } from 'vue-i18n';
 
+const { t, locale } = useI18n();
 const route = useRoute();
 const router = useRouter();
 
@@ -155,8 +157,10 @@ const roleSeverity = (role?: string) => {
   return 'info';
 };
 
+const dateLocale = computed(() => locale.value === 'ru' ? 'ru-RU' : 'en-GB');
+
 const formatDate = (dateStr: string) =>
-  new Date(dateStr).toLocaleDateString('en-GB', {
+  new Date(dateStr).toLocaleDateString(dateLocale.value, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -167,7 +171,7 @@ onMounted(async () => {
     const res = await api.get(`/users/${route.params.id}`);
     user.value = res.data;
   } catch (err: any) {
-    error.value = err?.response?.data?.message || 'Failed to load user';
+    error.value = err?.response?.data?.message || t('user.error');
   } finally {
     loading.value = false;
   }

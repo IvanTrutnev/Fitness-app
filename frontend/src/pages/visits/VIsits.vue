@@ -3,10 +3,10 @@
     <Tabs value="table" @update:value="onTabChange">
       <TabList>
         <Tab value="table"
-          ><i class="pi pi-list" style="margin-right: 6px" />Table</Tab
+          ><i class="pi pi-list" style="margin-right: 6px" />{{ t('visits.tabs.table') }}</Tab
         >
         <Tab value="calendar"
-          ><i class="pi pi-calendar" style="margin-right: 6px" />Calendar</Tab
+          ><i class="pi pi-calendar" style="margin-right: 6px" />{{ t('visits.tabs.calendar') }}</Tab
         >
       </TabList>
 
@@ -14,29 +14,29 @@
         <!-- ─── Tab 1: Table + Filters + Stats ─── -->
         <TabPanel value="table">
           <div class="filters-section">
-            <h4>Filters:</h4>
+            <h4>{{ t('visits.filters.title') }}</h4>
             <div class="filters-row">
               <template v-if="isAdmin">
                 <div class="filter-item">
-                  <label>User:</label>
+                  <label>{{ t('visits.filters.user') }}</label>
                   <Select
                     v-model="filters.userId"
                     :options="users"
                     optionLabel="email"
                     optionValue="_id"
-                    placeholder="All users"
+                    :placeholder="t('visits.filters.allUsers')"
                     style="width: 200px"
                     showClear
                   />
                 </div>
                 <div class="filter-item">
-                  <label>Trainer:</label>
+                  <label>{{ t('visits.filters.trainer') }}</label>
                   <Select
                     v-model="filters.trainerId"
                     :options="trainers"
                     optionLabel="email"
                     optionValue="_id"
-                    placeholder="All trainers"
+                    :placeholder="t('visits.filters.allTrainers')"
                     style="width: 200px"
                     showClear
                   />
@@ -45,13 +45,13 @@
 
               <template v-else-if="isTrainer">
                 <div class="filter-item">
-                  <label>User:</label>
+                  <label>{{ t('visits.filters.user') }}</label>
                   <Select
                     v-model="filters.userId"
                     :options="users"
                     optionLabel="email"
                     optionValue="_id"
-                    placeholder="All users"
+                    :placeholder="t('visits.filters.allUsers')"
                     style="width: 200px"
                     showClear
                   />
@@ -60,13 +60,13 @@
 
               <template v-else-if="isUser">
                 <div class="filter-item">
-                  <label>Trainer:</label>
+                  <label>{{ t('visits.filters.trainer') }}</label>
                   <Select
                     v-model="filters.trainerId"
                     :options="trainers"
                     optionLabel="email"
                     optionValue="_id"
-                    placeholder="All trainers"
+                    :placeholder="t('visits.filters.allTrainers')"
                     style="width: 200px"
                     showClear
                   />
@@ -74,7 +74,7 @@
               </template>
 
               <div class="filter-item">
-                <label>Date From:</label>
+                <label>{{ t('visits.filters.dateFrom') }}</label>
                 <DatePicker
                   v-model="filters.dateFrom"
                   dateFormat="dd/mm/yy"
@@ -83,7 +83,7 @@
                 />
               </div>
               <div class="filter-item">
-                <label>Date To:</label>
+                <label>{{ t('visits.filters.dateTo') }}</label>
                 <DatePicker
                   v-model="filters.dateTo"
                   dateFormat="dd/mm/yy"
@@ -92,7 +92,7 @@
                 />
               </div>
               <Button
-                label="Clear"
+                :label="t('visits.filters.clear')"
                 @click="clearFilters"
                 outlined
                 class="clear-filters-btn"
@@ -114,7 +114,7 @@
             :loading="loading"
           >
             <template v-if="isAdmin">
-              <Column field="userId.email" header="User" sortable>
+              <Column field="userId.email" :header="t('visits.columns.user')" sortable>
                 <template #body="{ data }">
                   <div class="user-cell">
                     <img
@@ -127,47 +127,41 @@
                   </div>
                 </template>
               </Column>
-              <Column field="trainerId.email" header="Trainer" sortable>
+              <Column field="trainerId.email" :header="t('visits.columns.trainer')" sortable>
                 <template #body="{ data }">
                   <span v-if="data.trainerId">{{ data.trainerId.email }}</span>
-                  <span v-else class="no-trainer">No trainer</span>
+                  <span v-else class="no-trainer">{{ t('visits.noTrainer') }}</span>
                 </template>
               </Column>
-              <Column field="date" header="Date" sortable>
-                <template #body="{ data }">{{
-                  formatDate(data.date)
-                }}</template>
+              <Column field="date" :header="t('visits.columns.date')" sortable>
+                <template #body="{ data }">{{ formatDate(data.date) }}</template>
               </Column>
-              <Column field="price" header="Price" sortable>
+              <Column field="price" :header="t('visits.columns.price')" sortable>
                 <template #body="{ data }">
                   <Tag
                     v-if="data.wasBalanceUsed"
                     severity="info"
-                    value="Balance"
+                    :value="t('visits.balance')"
                   />
                   <span v-else-if="data.price" class="price-paid">{{
                     formatPrice(data.price)
                   }}</span>
-                  <Tag v-else severity="secondary" value="Free" />
+                  <Tag v-else severity="secondary" :value="t('visits.free')" />
                 </template>
               </Column>
-              <Column field="notes" header="Notes">
+              <Column field="notes" :header="t('visits.columns.notes')">
                 <template #body="{ data }">
-                  <span v-if="data.notes" class="notes-cell">{{
-                    data.notes
-                  }}</span>
+                  <span v-if="data.notes" class="notes-cell">{{ data.notes }}</span>
                   <span v-else class="no-notes">-</span>
                 </template>
               </Column>
             </template>
 
             <template v-else-if="isTrainer">
-              <Column field="date" header="Date" sortable>
-                <template #body="{ data }">{{
-                  formatDate(data.date)
-                }}</template>
+              <Column field="date" :header="t('visits.columns.date')" sortable>
+                <template #body="{ data }">{{ formatDate(data.date) }}</template>
               </Column>
-              <Column field="userId.email" header="User" sortable>
+              <Column field="userId.email" :header="t('visits.columns.user')" sortable>
                 <template #body="{ data }">
                   <div class="user-cell">
                     <img
@@ -180,70 +174,68 @@
                   </div>
                 </template>
               </Column>
-              <Column field="price" header="Payment" sortable>
+              <Column field="price" :header="t('visits.columns.payment')" sortable>
                 <template #body="{ data }">
                   <Tag
                     v-if="data.wasBalanceUsed"
                     severity="info"
-                    value="Balance"
+                    :value="t('visits.balance')"
                   />
                   <span v-else-if="data.price" class="price-paid">{{
                     formatPrice(data.price)
                   }}</span>
-                  <Tag v-else severity="secondary" value="Free" />
+                  <Tag v-else severity="secondary" :value="t('visits.free')" />
                 </template>
               </Column>
             </template>
 
             <template v-else>
-              <Column field="date" header="Date" sortable>
-                <template #body="{ data }">{{
-                  formatDate(data.date)
-                }}</template>
+              <Column field="date" :header="t('visits.columns.date')" sortable>
+                <template #body="{ data }">{{ formatDate(data.date) }}</template>
               </Column>
-              <Column field="trainerId.email" header="Trainer" sortable>
+              <Column field="trainerId.email" :header="t('visits.columns.trainer')" sortable>
                 <template #body="{ data }">
                   <span v-if="data.trainerId">{{ data.trainerId.email }}</span>
-                  <span v-else class="no-trainer">No trainer</span>
+                  <span v-else class="no-trainer">{{ t('visits.noTrainer') }}</span>
                 </template>
               </Column>
-              <Column field="price" header="Payment" sortable>
+              <Column field="price" :header="t('visits.columns.payment')" sortable>
                 <template #body="{ data }">
                   <Tag
                     v-if="data.wasBalanceUsed"
                     severity="success"
-                    value="From Balance"
+                    :value="t('visits.fromBalance')"
                   />
-                  <span v-else-if="data.price" class="price-paid"
-                    >Paid {{ formatPrice(data.price) }}</span
-                  >
-                  <Tag v-else severity="secondary" value="Free" />
+                  <span v-else-if="data.price" class="price-paid">
+                    {{ t('visits.paid', { price: formatPrice(data.price) }) }}
+                  </span>
+                  <Tag v-else severity="secondary" :value="t('visits.free')" />
                 </template>
               </Column>
             </template>
 
             <template #empty>
-              <div class="empty-state"><p>No visits found</p></div>
+              <div class="empty-state"><p>{{ t('visits.empty') }}</p></div>
             </template>
           </DataTable>
 
           <div class="stats-section" v-if="stats">
-            <h4>Statistics</h4>
+            <h4>{{ t('visits.stats.title') }}</h4>
             <div class="stats-cards">
               <div class="stat-card">
-                <span class="stat-label">Total Visits</span>
+                <span class="stat-label">{{ t('visits.stats.totalVisits') }}</span>
                 <span class="stat-value">{{ stats.totalVisits }}</span>
               </div>
               <div class="stat-card">
-                <span class="stat-label">Balance Visits</span>
+                <span class="stat-label">{{ t('visits.stats.balanceVisits') }}</span>
                 <span class="stat-value">{{ stats.balanceVisits }}</span>
               </div>
               <div class="stat-card">
-                <span class="stat-label">Paid Visits</span>
+                <span class="stat-label">{{ t('visits.stats.paidVisits') }}</span>
                 <span class="stat-value">{{ stats.paidVisits }}</span>
               </div>
               <div class="stat-card" v-if="isAdmin || isTrainer">
-                <span class="stat-label">Revenue</span>
+                <span class="stat-label">{{ t('visits.stats.revenue') }}</span>
                 <span class="stat-value">{{ formatPrice(stats.revenue) }}</span>
               </div>
             </div>
@@ -287,7 +279,9 @@ import { useToast } from 'primevue/usetoast';
 import { UserRole } from '@/constants/user';
 import type { Visit, VisitStats } from '@/types/visit';
 import VisitsCalendar from './VisitsCalendar.vue';
+import { useI18n } from 'vue-i18n';
 
+const { t, locale } = useI18n();
 const userStore = useUserStore();
 const toast = useToast();
 
@@ -356,8 +350,8 @@ const loadVisits = async () => {
     console.error('Failed to load visits:', error);
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to load visits',
+      summary: t('visits.error.title'),
+      detail: t('visits.error.load'),
       life: 3000,
     });
   } finally {
@@ -413,9 +407,11 @@ watch(
   { deep: true },
 );
 
+const dateLocale = computed(() => locale.value === 'ru' ? 'ru-RU' : 'en-GB');
+
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-GB', {
+  return date.toLocaleDateString(dateLocale.value, {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -607,5 +603,4 @@ onMounted(() => {
     color: var(--gym-dark);
   }
 }
-
 </style>

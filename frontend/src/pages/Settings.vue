@@ -1,13 +1,11 @@
 <template>
   <div class="settings-page">
-    <h2>Settings</h2>
-
     <Card class="settings-card">
-      <template #title>Profile Information</template>
+      <template #title>{{ t('settings.profileInfo') }}</template>
       <template #content>
         <form @submit.prevent="updateSettings">
           <div class="field">
-            <label>Avatar</label>
+            <label>{{ t('settings.labels.avatar') }}</label>
             <div
               @click="triggerFileUpload"
               class="avatar-clickable avatar-section"
@@ -23,7 +21,7 @@
                   class="pi pi-camera"
                   style="font-size: 1.5rem; color: #6c757d"
                 ></i>
-                <span>Click to upload</span>
+                <span>{{ t('settings.clickToUpload') }}</span>
               </div>
               <input
                 ref="fileInput"
@@ -36,40 +34,40 @@
           </div>
 
           <div class="field">
-            <label for="username">Username</label>
+            <label for="username">{{ t('settings.labels.username') }}</label>
             <InputText
               id="username"
               v-model="form.username"
-              placeholder="Enter username"
+              :placeholder="t('settings.placeholders.username')"
               class="w-full"
             />
           </div>
 
           <div class="field">
-            <label for="phone">Phone Number</label>
+            <label for="phone">{{ t('settings.labels.phone') }}</label>
             <InputText
               id="phone"
               v-model="form.phone"
-              placeholder="Enter phone number"
+              :placeholder="t('settings.placeholders.phone')"
               class="w-full"
             />
           </div>
 
           <div class="field">
-            <label for="email">Email</label>
+            <label for="email">{{ t('settings.labels.email') }}</label>
             <InputText
               id="email"
               v-model="form.email"
               disabled
               class="w-full"
             />
-            <small class="field-help">Email cannot be changed</small>
+            <small class="field-help">{{ t('settings.emailHelp') }}</small>
           </div>
 
           <div class="field">
             <Button
               type="submit"
-              label="Save Changes"
+              :label="t('settings.saveChanges')"
               :loading="isLoading"
               icon="pi pi-check"
               class="w-full"
@@ -92,6 +90,9 @@ import Button from 'primevue/button';
 import Toast from 'primevue/toast';
 import api from '@/lib/api';
 import { useUserStore } from '@/store/user';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const toast = useToast();
 const userStore = useUserStore();
@@ -114,7 +115,7 @@ watch(
       form.email = userData.email || '';
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const triggerFileUpload = () => {
@@ -136,16 +137,16 @@ const onFileSelect = async (event: Event) => {
 
     toast.add({
       severity: 'success',
-      summary: 'Success',
-      detail: 'Avatar updated successfully',
+      summary: t('common.success'),
+      detail: t('settings.toast.avatarSuccess'),
       life: 3000,
     });
   } catch (err) {
     console.error('Avatar loading error', err);
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to upload avatar',
+      summary: t('common.error'),
+      detail: t('settings.toast.avatarError'),
       life: 3000,
     });
   }
@@ -166,17 +167,18 @@ const updateSettings = async () => {
 
     toast.add({
       severity: 'success',
-      summary: 'Success',
-      detail: 'Settings updated successfully',
+      summary: t('common.success'),
+      detail: t('settings.toast.settingsSuccess'),
       life: 3000,
     });
   } catch (err: any) {
     console.error('Failed to update settings', err);
 
-    const message = err.response?.data?.message || 'Failed to update settings';
+    const message =
+      err.response?.data?.message || t('settings.toast.settingsError');
     toast.add({
       severity: 'error',
-      summary: 'Error',
+      summary: t('common.error'),
       detail: message,
       life: 3000,
     });

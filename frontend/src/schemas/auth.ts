@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { toTypedSchema } from '@vee-validate/zod';
 
 const identifierField = z
-  .string({ required_error: 'Email or phone is required' })
+  .string()
   .min(1, 'Email or phone is required')
   .refine(
     (val) =>
@@ -14,7 +14,7 @@ export const loginSchema = toTypedSchema(
   z.object({
     identifier: identifierField,
     password: z
-      .string({ required_error: 'Password is required' })
+      .string()
       .min(1, 'Password is required'),
   }),
 );
@@ -23,7 +23,7 @@ export const registerSchema = toTypedSchema(
   z.object({
     identifier: identifierField,
     password: z
-      .string({ required_error: 'Password is required' })
+      .string()
       .min(6, 'Password must be at least 6 characters'),
   }),
 );

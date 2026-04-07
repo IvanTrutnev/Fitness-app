@@ -10,14 +10,25 @@
 
       <div class="header-actions">
         <span v-if="userStore.currentUser" class="user-greeting">
-          {{ userStore.currentUser.name || userStore.currentUser.email }}
+          {{ userStore.currentUser.username || userStore.currentUser.email }}
         </span>
+
+        <button
+          class="lang-toggle"
+          @click="toggleLocale"
+          :title="
+            locale === 'ru' ? 'Switch to English' : 'Переключить на русский'
+          "
+        >
+          {{ locale === 'ru' ? 'EN' : 'RU' }}
+        </button>
+
         <Menu :model="menuItems" popup ref="menu" />
         <Button
           class="account-btn"
           severity="contrast"
           icon="pi pi-user"
-          label="Account"
+          :label="t('nav.account')"
           @click="toggleMenu"
           rounded
         />
@@ -37,26 +48,33 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/store/auth';
 import { useUserStore } from '@/store/user';
+import { useI18n } from 'vue-i18n';
 
+const { t, locale } = useI18n();
 const auth = useAuthStore();
 const userStore = useUserStore();
 const router = useRouter();
 const menu = ref();
 
+const toggleLocale = () => {
+  locale.value = locale.value === 'ru' ? 'en' : 'ru';
+  localStorage.setItem('locale', locale.value);
+};
+
 const menuItems = computed(() => {
   const items = [
     {
-      label: 'Profile',
+      label: t('nav.profile'),
       icon: 'pi pi-user',
       command: () => router.push({ name: 'Profile' }),
     },
     {
-      label: 'Visits',
+      label: t('nav.visits'),
       icon: 'pi pi-calendar',
       command: () => router.push({ name: 'Visits' }),
     },
     {
-      label: 'Settings',
+      label: t('nav.settings'),
       icon: 'pi pi-cog',
       command: () => router.push({ name: 'Settings' }),
     },
@@ -64,14 +82,14 @@ const menuItems = computed(() => {
 
   if (userStore.currentUser?.role === 'admin') {
     items.splice(2, 0, {
-      label: 'Users',
+      label: t('nav.users'),
       icon: 'pi pi-users',
       command: () => router.push({ name: 'Users' }),
     });
   }
 
   items.push({
-    label: 'Logout',
+    label: t('nav.logout'),
     icon: 'pi pi-sign-out',
     command: async () => logout(),
   });
@@ -89,7 +107,7 @@ function toggleMenu(event: Event) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="postcss">
 .app-shell {
   min-height: 100vh;
   display: flex;
@@ -148,6 +166,28 @@ function toggleMenu(event: Event) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.lang-toggle {
+  background: transparent;
+  border: 1px solid #4338ca;
+  color: #a5b4fc;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+
+  &:hover {
+    background: var(--gym-accent);
+    border-color: var(--gym-accent);
+    color: #fff;
+  }
 }
 
 .account-btn {

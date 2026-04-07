@@ -6,32 +6,32 @@
         <span class="brand-name-lg">FitClub</span>
       </div>
       <h1 class="register-hero-title">
-        Join the Club.<br />Start Your Journey.
+        {{ t('register.heroTitle1') }}<br />{{ t('register.heroTitle2') }}
       </h1>
       <p class="register-hero-sub">
-        Create your account and get access to everything your gym has to offer.
+        {{ t('register.heroSubtitle') }}
       </p>
 
       <div class="register-perks">
         <div class="perk-item">
           <i class="pi pi-check-circle" />
-          <span>Track your visits and progress</span>
+          <span>{{ t('register.perk1') }}</span>
         </div>
         <div class="perk-item">
           <i class="pi pi-check-circle" />
-          <span>Manage your membership balance</span>
+          <span>{{ t('register.perk2') }}</span>
         </div>
         <div class="perk-item">
           <i class="pi pi-check-circle" />
-          <span>Access your documents and history</span>
+          <span>{{ t('register.perk3') }}</span>
         </div>
       </div>
     </div>
 
     <div class="register-right">
       <div class="register-card">
-        <h2 class="register-title">Create account</h2>
-        <p class="register-subtitle">Fill in your details to get started</p>
+        <h2 class="register-title">{{ t('register.title') }}</h2>
+        <p class="register-subtitle">{{ t('register.subtitle') }}</p>
 
         <div class="flex flex-col gap-4">
           <div class="w-full">
@@ -43,7 +43,7 @@
                 :class="{ 'p-invalid': errors.identifier }"
                 class="w-full"
               />
-              <label for="identifier">Email or Phone</label>
+              <label for="identifier">{{ t('register.identifier') }}</label>
             </FloatLabel>
             <small
               class="text-red-500 text-xs mt-1 block"
@@ -65,7 +65,7 @@
                 class="w-full"
                 inputClass="w-full"
               />
-              <label for="password">Password</label>
+              <label for="password">{{ t('register.password') }}</label>
             </FloatLabel>
             <small
               class="text-red-500 text-xs mt-1 block"
@@ -76,7 +76,7 @@
           </div>
 
           <Button
-            label="Create Account"
+            :label="t('register.createAccount')"
             @click="onRegister"
             :loading="loading"
             class="w-full mt-1"
@@ -84,10 +84,8 @@
           />
 
           <div class="text-center">
-            <span class="text-gray-500 text-sm">Already have an account? </span>
-            <router-link to="/login" class="login-link"
-              >Sign in here</router-link
-            >
+            <span class="text-gray-500 text-sm">{{ t('register.hasAccount') }} </span>
+            <router-link to="/login" class="login-link">{{ t('register.signInLink') }}</router-link>
           </div>
         </div>
       </div>
@@ -106,6 +104,9 @@ import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Button from 'primevue/button';
 import FloatLabel from 'primevue/floatlabel';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const { handleSubmit, errors, defineField } = useForm({
   validationSchema: registerSchema,
@@ -131,10 +132,10 @@ const onRegister = handleSubmit(async (values) => {
     router.push('/login');
   } catch (err: any) {
     const message =
-      err?.response?.data?.message || err?.message || 'Registration failed. Please try again.';
+      err?.response?.data?.message || err?.message || t('register.failedDetail');
     toast.add({
       severity: 'error',
-      summary: 'Registration failed',
+      summary: t('register.failed'),
       detail: message,
       life: 4000,
     });

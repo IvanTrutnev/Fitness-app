@@ -14,7 +14,7 @@
               class="pi pi-camera"
               style="font-size: 1.5rem; color: #6c757d"
             ></i>
-            <span>Click to upload</span>
+            <span>{{ t('profile.clickToUpload') }}</span>
           </div>
           <input
             ref="fileInput"
@@ -26,18 +26,18 @@
         </div>
 
         <div class="user-details">
-          <p><strong>Email:</strong> {{ currentUser.email }}</p>
+          <p><strong>{{ t('profile.labels.email') }}</strong> {{ currentUser.email }}</p>
           <p>
-            <strong>Username:</strong> {{ currentUser.username || 'Not set' }}
+            <strong>{{ t('profile.labels.username') }}</strong> {{ currentUser.username || t('profile.notSet') }}
           </p>
-          <p><strong>Phone:</strong> {{ currentUser.phone || 'Not set' }}</p>
-          <p><strong>ID:</strong> {{ currentUser._id }}</p>
+          <p><strong>{{ t('profile.labels.phone') }}</strong> {{ currentUser.phone || t('profile.notSet') }}</p>
+          <p><strong>{{ t('profile.labels.id') }}</strong> {{ currentUser._id }}</p>
           <p v-if="currentUser.role === UserRole.USER">
-            <strong>Balance:</strong>
+            <strong>{{ t('profile.labels.balance') }}</strong>
             {{
               currentUser.activeBalance
                 ? currentUser.activeBalance.visits
-                : 'No active balance'
+                : t('profile.noBalance')
             }}
           </p>
         </div>
@@ -46,7 +46,7 @@
 
     <!-- Загрузка документов -->
     <div class="documents-section">
-      <h3>Documents</h3>
+      <h3>{{ t('profile.documents') }}</h3>
 
       <div class="upload-section">
         <FileUpload
@@ -58,9 +58,7 @@
           customUpload
           auto
           :disabled="isUploadingDocument"
-          :chooseLabel="
-            isUploadingDocument ? 'Uploading...' : 'Upload Document'
-          "
+          :chooseLabel="isUploadingDocument ? t('profile.uploading') : t('profile.uploadDocument')"
           class="upload-btn"
         />
       </div>
@@ -104,7 +102,7 @@
         </div>
       </div>
 
-      <p v-else class="no-documents">No documents uploaded yet.</p>
+      <p v-else class="no-documents">{{ t('profile.noDocuments') }}</p>
     </div>
   </div>
 </template>
@@ -117,6 +115,9 @@ import api from '@/lib/api';
 import FileUpload from 'primevue/fileupload';
 import Button from 'primevue/button';
 import { UserRole } from '@/constants/user';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 interface Document {
   _id: string;
@@ -155,16 +156,16 @@ const onFileSelect = async (event: Event) => {
 
     toast.add({
       severity: 'success',
-      summary: 'Success',
-      detail: 'Avatar updated successfully',
+      summary: t('common.success'),
+      detail: t('profile.toast.avatarSuccess'),
       life: 3000,
     });
   } catch (err) {
     console.error('Avatar loading error', err);
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to upload avatar',
+      summary: t('common.error'),
+      detail: t('profile.toast.avatarError'),
       life: 3000,
     });
   }
@@ -179,8 +180,8 @@ const loadDocuments = async () => {
     console.error('Failed to load documents', err);
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to load documents',
+      summary: t('common.error'),
+      detail: t('profile.toast.docLoadError'),
       life: 3000,
     });
   }
@@ -200,8 +201,8 @@ const onDocumentSelect = async (event: any) => {
 
     toast.add({
       severity: 'success',
-      summary: 'Success',
-      detail: 'Document uploaded successfully',
+      summary: t('common.success'),
+      detail: t('profile.toast.docSuccess'),
       life: 3000,
     });
 
@@ -210,8 +211,8 @@ const onDocumentSelect = async (event: any) => {
     console.error('Document upload error', err);
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to upload document',
+      summary: t('common.error'),
+      detail: t('profile.toast.docError'),
       life: 3000,
     });
   } finally {
@@ -225,8 +226,8 @@ const deleteDocument = async (documentId: string) => {
 
     toast.add({
       severity: 'success',
-      summary: 'Success',
-      detail: 'Document deleted successfully',
+      summary: t('common.success'),
+      detail: t('profile.toast.docDeleteSuccess'),
       life: 3000,
     });
 
@@ -235,8 +236,8 @@ const deleteDocument = async (documentId: string) => {
     console.error('Document delete error', err);
     toast.add({
       severity: 'error',
-      summary: 'Error',
-      detail: 'Failed to delete document',
+      summary: t('common.error'),
+      detail: t('profile.toast.docDeleteError'),
       life: 3000,
     });
   }

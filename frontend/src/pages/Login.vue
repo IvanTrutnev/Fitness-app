@@ -5,16 +5,16 @@
         <span class="brand-icon-lg"><i class="pi pi-bolt" /></span>
         <span class="brand-name-lg">FitClub</span>
       </div>
-      <h1 class="login-hero-title">Train Hard.<br />Track Smart.</h1>
+      <h1 class="login-hero-title">{{ t('login.heroTitle1') }}<br />{{ t('login.heroTitle2') }}</h1>
       <p class="login-hero-sub">
-        Manage your gym, members and visits all in one place.
+        {{ t('login.heroSubtitle') }}
       </p>
     </div>
 
     <div class="login-right">
       <div class="login-card">
-        <h2 class="login-title">Welcome back</h2>
-        <p class="login-subtitle">Sign in to your account</p>
+        <h2 class="login-title">{{ t('login.title') }}</h2>
+        <p class="login-subtitle">{{ t('login.subtitle') }}</p>
 
         <div class="flex flex-col gap-4">
           <div class="w-full">
@@ -26,7 +26,7 @@
                 :class="{ 'p-invalid': errors.identifier }"
                 class="w-full"
               />
-              <label for="identifier">Email or Phone</label>
+              <label for="identifier">{{ t('login.identifier') }}</label>
             </FloatLabel>
             <small
               class="text-red-500 text-xs mt-1 block"
@@ -48,7 +48,7 @@
                 class="w-full"
                 inputClass="w-full"
               />
-              <label for="password">Password</label>
+              <label for="password">{{ t('login.password') }}</label>
             </FloatLabel>
             <small
               class="text-red-500 text-xs mt-1 block"
@@ -59,7 +59,7 @@
           </div>
 
           <Button
-            label="Sign In"
+            :label="t('login.signIn')"
             @click="onLogin"
             :loading="loading"
             class="w-full mt-1"
@@ -67,10 +67,8 @@
           />
 
           <div class="text-center">
-            <span class="text-gray-500 text-sm">Don't have an account? </span>
-            <router-link to="/register" class="register-link"
-              >Register here</router-link
-            >
+            <span class="text-gray-500 text-sm">{{ t('login.noAccount') }} </span>
+            <router-link to="/register" class="register-link">{{ t('login.registerLink') }}</router-link>
           </div>
         </div>
       </div>
@@ -89,6 +87,9 @@ import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Button from 'primevue/button';
 import FloatLabel from 'primevue/floatlabel';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const { handleSubmit, errors, defineField } = useForm({
   validationSchema: loginSchema,
@@ -114,10 +115,10 @@ const onLogin = handleSubmit(async (values) => {
     router.push('/users');
   } catch (err: any) {
     const message =
-      err?.response?.data?.message || err?.message || 'Invalid email or password';
+      err?.response?.data?.message || err?.message || t('login.invalidCredentials');
     toast.add({
       severity: 'error',
-      summary: 'Login failed',
+      summary: t('login.failed'),
       detail: message,
       life: 4000,
     });

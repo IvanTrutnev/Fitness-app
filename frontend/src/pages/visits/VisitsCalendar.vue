@@ -8,17 +8,17 @@
     :visible="showEventDialog"
     @update:visible="showEventDialog = $event"
     modal
-    header="Visit Details"
+    :header="t('calendar.visitDetails')"
     :style="{ width: '420px' }"
     :draggable="false"
   >
     <div v-if="selectedVisit" class="event-detail">
       <div class="event-detail-row">
-        <span class="event-detail-label">Date</span>
+        <span class="event-detail-label">{{ t('calendar.date') }}</span>
         <span>{{ formatDate(selectedVisit.date) }}</span>
       </div>
       <div class="event-detail-row" v-if="selectedVisit.userId?.email">
-        <span class="event-detail-label">User</span>
+        <span class="event-detail-label">{{ t('calendar.user') }}</span>
         <div class="user-cell">
           <img
             v-if="selectedVisit.userId.avatarUrl"
@@ -30,20 +30,20 @@
         </div>
       </div>
       <div class="event-detail-row">
-        <span class="event-detail-label">Trainer</span>
+        <span class="event-detail-label">{{ t('calendar.trainer') }}</span>
         <span v-if="selectedVisit.trainerId">{{ selectedVisit.trainerId.email }}</span>
-        <span v-else class="no-trainer">No trainer</span>
+        <span v-else class="no-trainer">{{ t('calendar.noTrainer') }}</span>
       </div>
       <div class="event-detail-row">
-        <span class="event-detail-label">Payment</span>
-        <Tag v-if="selectedVisit.wasBalanceUsed" severity="info" value="Balance" />
+        <span class="event-detail-label">{{ t('calendar.payment') }}</span>
+        <Tag v-if="selectedVisit.wasBalanceUsed" severity="info" :value="t('calendar.balance')" />
         <span v-else-if="selectedVisit.price" class="price-paid">{{
           formatPrice(selectedVisit.price)
         }}</span>
-        <Tag v-else severity="secondary" value="Free" />
+        <Tag v-else severity="secondary" :value="t('calendar.free')" />
       </div>
       <div class="event-detail-row" v-if="selectedVisit.notes">
-        <span class="event-detail-label">Notes</span>
+        <span class="event-detail-label">{{ t('calendar.notes') }}</span>
         <span>{{ selectedVisit.notes }}</span>
       </div>
     </div>
@@ -61,6 +61,9 @@ import type { EventClickArg } from '@fullcalendar/core';
 import Dialog from 'primevue/dialog';
 import Tag from 'primevue/tag';
 import type { Visit } from '@/types/visit';
+import { useI18n } from 'vue-i18n';
+
+const { t, locale } = useI18n();
 
 const props = defineProps<{
   visits: Visit[];
@@ -82,8 +85,8 @@ const calendarEvents = computed(() =>
   props.visits.map((v) => {
     const label =
       props.isAdmin || props.isTrainer
-        ? (v.userId?.email ?? 'Visit')
-        : (v.trainerId?.email ?? 'Training');
+        ? (v.userId?.email ?? t('calendar.visit'))
+        : (v.trainerId?.email ?? t('calendar.training'));
 
     const color = v.wasBalanceUsed
       ? '#3b82f6'
@@ -116,12 +119,14 @@ const calendarOptions = computed(() => ({
     showEventDialog.value = true;
   },
   height: 'auto',
-  locale: 'en',
+  locale: locale.value,
 }));
+
+const dateLocale = computed(() => locale.value === 'ru' ? 'ru-RU' : 'en-GB');
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-GB', {
+  return date.toLocaleDateString(dateLocale.value, {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
