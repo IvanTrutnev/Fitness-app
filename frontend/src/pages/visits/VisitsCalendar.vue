@@ -119,7 +119,7 @@ const calendarOptions = computed(() => ({
     : { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
   footerToolbar: isMobile.value
     ? { left: 'today', right: 'dayGridMonth,timeGridWeek,timeGridDay' }
-    : false,
+    : (undefined as undefined),
   ...(isMobile.value && {
     views: {
       timeGridWeek: { titleFormat: { month: 'short' as const, day: 'numeric' as const } },
