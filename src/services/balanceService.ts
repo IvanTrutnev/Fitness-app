@@ -2,6 +2,8 @@
 import { Balance } from '../models/Balance';
 import { VisitHistory } from '../models/VisitHistory';
 import { EventPublisher } from '../kafka/eventPublisher';
+import { KAFKA_ENABLED } from '../kafka/config';
+import { NotificationService } from './notificationService';
 
 export class BalanceService {
   /**
@@ -38,7 +40,34 @@ export class BalanceService {
           : notes;
       }
 
-      return existingBalance.save();
+      const saved = await existingBalance.save();
+
+      try {
+        await EventPublisher.publishBalanceCreated({
+          userId,
+          balanceId: saved._id.toString(),
+          visits,
+          dueDate: saved.dueDate,
+          price,
+          notes,
+        });
+      } catch (error) {
+        console.error('Failed to publish balance topped up event:', error);
+      }
+
+      if (!KAFKA_ENABLED) {
+        try {
+          await NotificationService.createBalanceCreated({
+            userId,
+            visits,
+            dueDate: saved.dueDate,
+          });
+        } catch (error) {
+          console.error('Failed to create balance topped up notification:', error);
+        }
+      }
+
+      return saved;
     } else {
       // Create new balance
       return BalanceService.createBalance(
@@ -85,6 +114,18 @@ export class BalanceService {
     } catch (error) {
       console.error('Failed to publish balance created event:', error);
       // Не прерываем выполнение, если Kafka недоступна
+    }
+
+    if (!KAFKA_ENABLED) {
+      try {
+        await NotificationService.createBalanceCreated({
+          userId,
+          visits,
+          dueDate,
+        });
+      } catch (error) {
+        console.error('Failed to create balance created notification:', error);
+      }
     }
 
     return savedBalance;
@@ -179,6 +220,24 @@ export class BalanceService {
       } catch (error) {
         console.error('Failed to publish balance visit used event:', error);
         // Don't interrupt execution if Kafka is unavailable
+      }
+
+      if (!KAFKA_ENABLED) {
+        const balanceId = balance._id.toString();
+        const remaining = balance.visits;
+        try {
+          if (remaining === 0) {
+            await NotificationService.createBalanceEmpty({ userId, balanceId });
+          } else if (remaining <= 3) {
+            await NotificationService.createBalanceLow({
+              userId,
+              remainingVisits: remaining,
+              balanceId,
+            });
+          }
+        } catch (error) {
+          console.error('Failed to create visit used notification:', error);
+        }
       }
 
       return {
@@ -280,16 +339,49 @@ export class BalanceService {
    * Deactivate expired balances (can be run via cron)
    */
   static async deactivateExpiredBalances() {
-    const result = await Balance.updateMany(
-      {
-        isActive: true,
-        dueDate: { $lt: new Date() },
-      },
-      {
-        $set: { isActive: false },
-      },
+    const expiredBalances = await Balance.find({
+      isActive: true,
+      dueDate: { $lt: new Date() },
+    });
+
+    if (expiredBalances.length === 0) {
+      return 0;
+    }
+
+    await Balance.updateMany(
+      { _id: { $in: expiredBalances.map((b) => b._id) } },
+      { $set: { isActive: false } },
     );
 
-    return result.modifiedCount;
+    for (const balance of expiredBalances) {
+      const userId = balance.userId.toString();
+      const balanceId = balance._id.toString();
+
+      try {
+        await EventPublisher.publishBalanceExpired({
+          userId,
+          balanceId,
+          visits: balance.visits,
+          dueDate: balance.dueDate,
+        });
+      } catch (error) {
+        console.error('Failed to publish balance expired event:', error);
+      }
+
+      if (!KAFKA_ENABLED) {
+        try {
+          await NotificationService.createBalanceExpired({
+            userId,
+            visits: balance.visits,
+            dueDate: balance.dueDate,
+            balanceId,
+          });
+        } catch (error) {
+          console.error('Failed to create balance expired notification:', error);
+        }
+      }
+    }
+
+    return expiredBalances.length;
   }
 }

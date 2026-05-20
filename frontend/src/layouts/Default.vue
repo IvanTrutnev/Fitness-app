@@ -13,6 +13,8 @@
           {{ userStore.currentUser.username || userStore.currentUser.email }}
         </span>
 
+        <NotificationBell />
+
         <button
           class="lang-toggle"
           @click="toggleLocale"
@@ -49,6 +51,10 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/store/auth';
 import { useUserStore } from '@/store/user';
 import { useI18n } from 'vue-i18n';
+import NotificationBell from '@/components/NotificationBell.vue';
+import { useNotifications } from '@/composables/useNotifications';
+
+useNotifications();
 
 const { t, locale } = useI18n();
 const auth = useAuthStore();

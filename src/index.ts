@@ -6,8 +6,11 @@ import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import balanceRoutes from './routes/balance';
 import visitRoutes from './routes/visits';
+import notificationRoutes from './routes/notifications';
 import cors from 'cors';
 import { KafkaManager } from './kafka/kafkaManager';
+import { startBalanceCleanupJob } from './jobs/balanceCleanup';
+import { startBalanceExpiryWarningJob } from './jobs/balanceExpiryWarning';
 
 dotenv.config();
 
@@ -55,6 +58,7 @@ app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/balance', balanceRoutes);
 app.use('/visits', visitRoutes);
+app.use('/notifications', notificationRoutes);
 
 app.get('/', (_, res) => {
   res.send('Hello from Express + TS + Hot Reload!');
@@ -77,6 +81,9 @@ async function start() {
     await connectPostgres();
 
     await connectMongo();
+
+    startBalanceCleanupJob();
+    startBalanceExpiryWarningJob();
 
     // Initialize Kafka
     try {

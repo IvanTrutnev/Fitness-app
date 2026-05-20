@@ -217,5 +217,32 @@
   "common": {
     "success": "Успешно",
     "error": "Ошибка"
+  },
+  "notifications": {
+    "title": "Уведомления",
+    "empty": "Пока нет уведомлений",
+    "markAllRead": "Прочитать все",
+    "types": {
+      "balance_created": {
+        "title": "Баланс пополнен",
+        "message": "+{visits} занятий. Действует до {dueDate}."
+      },
+      "balance_low": {
+        "title": "Мало занятий",
+        "message": "Осталось {remainingVisits} занятий на балансе."
+      },
+      "balance_empty": {
+        "title": "Занятия закончились",
+        "message": "Предоплаченные занятия закончились. Пополните баланс."
+      },
+      "balance_expiry_warning": {
+        "title": "Скоро истечёт абонемент",
+        "message": "На балансе {visits} занятий — истекает через {daysLeft} дн."
+      },
+      "balance_expired": {
+        "title": "Абонемент истёк",
+        "message": "Срок действия баланса истёк. Неиспользовано занятий: {visits}."
+      }
+    }
   }
 }

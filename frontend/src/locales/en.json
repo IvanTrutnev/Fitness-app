@@ -217,5 +217,32 @@
   "common": {
     "success": "Success",
     "error": "Error"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "markAllRead": "Mark all read",
+    "types": {
+      "balance_created": {
+        "title": "Balance topped up",
+        "message": "+{visits} visits added. Valid until {dueDate}."
+      },
+      "balance_low": {
+        "title": "Low balance",
+        "message": "Only {remainingVisits} visit(s) remaining on your balance."
+      },
+      "balance_empty": {
+        "title": "No visits left",
+        "message": "Your prepaid visits have run out. Please top up your balance."
+      },
+      "balance_expiry_warning": {
+        "title": "Balance expiring soon",
+        "message": "Your balance ({visits} visit(s)) expires in {daysLeft} day(s)."
+      },
+      "balance_expired": {
+        "title": "Balance expired",
+        "message": "Your balance has expired. Unused visits: {visits}."
+      }
+    }
   }
 }

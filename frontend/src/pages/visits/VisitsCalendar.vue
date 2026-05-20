@@ -122,9 +122,9 @@ const calendarOptions = computed(() => ({
     : false,
   ...(isMobile.value && {
     views: {
-      timeGridWeek: { titleFormat: { month: 'short', day: 'numeric' } },
-      timeGridDay: { titleFormat: { month: 'short', day: 'numeric' } },
-      dayGridMonth: { titleFormat: { month: 'short', year: 'numeric' } },
+      timeGridWeek: { titleFormat: { month: 'short' as const, day: 'numeric' as const } },
+      timeGridDay: { titleFormat: { month: 'short' as const, day: 'numeric' as const } },
+      dayGridMonth: { titleFormat: { month: 'short' as const, year: 'numeric' as const } },
     },
   }),
   events: calendarEvents.value,

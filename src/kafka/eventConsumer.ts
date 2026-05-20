@@ -8,6 +8,7 @@ import type {
   AnalyticsEvent,
   AuditEvent,
 } from './config';
+import { NotificationService } from '../services/notificationService';
 
 export class EventConsumer {
   private static isConnected = false;
@@ -129,10 +130,17 @@ export class EventConsumer {
       dueDate: event.dueDate,
     });
 
-    // Здесь можно добавить логику:
-    // - Отправка welcome email
-    // - Логирование в analytics
-    // - Создание напоминаний
+    if (!event.userId || event.visits == null || !event.dueDate) return;
+
+    try {
+      await NotificationService.createBalanceCreated({
+        userId: event.userId,
+        visits: event.visits,
+        dueDate: new Date(event.dueDate),
+      });
+    } catch (error) {
+      console.error('Failed to create balance_created notification:', error);
+    }
   }
 
   private static async handleBalanceVisitUsed(event: BalanceEvent) {
@@ -142,14 +150,24 @@ export class EventConsumer {
       previousVisits: event.previousVisits,
     });
 
-    // Логика:
-    // - Проверка остатка посещений
-    // - Отправка уведомления при низком балансе
-    if (event.visits !== undefined && event.visits <= 2) {
-      console.log(
-        `⚠️ Low balance warning for user ${event.userId}: ${event.visits} visits remaining`,
-      );
-      // Здесь можно отправить уведомление о низком балансе
+    if (!event.userId || !event.balanceId || event.visits === undefined) return;
+
+    try {
+      const remaining = event.visits;
+      if (remaining === 0) {
+        await NotificationService.createBalanceEmpty({
+          userId: event.userId,
+          balanceId: event.balanceId,
+        });
+      } else if (remaining <= 3) {
+        await NotificationService.createBalanceLow({
+          userId: event.userId,
+          remainingVisits: remaining,
+          balanceId: event.balanceId,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to create balance visit_used notification:', error);
     }
   }
 
@@ -159,9 +177,18 @@ export class EventConsumer {
       expiredVisits: event.visits,
     });
 
-    // Логика:
-    // - Отправка уведомления об истечении
-    // - Предложение покупки нового баланса
+    if (!event.userId || !event.balanceId) return;
+
+    try {
+      await NotificationService.createBalanceExpired({
+        userId: event.userId,
+        visits: event.visits ?? 0,
+        dueDate: event.dueDate ? new Date(event.dueDate) : new Date(),
+        balanceId: event.balanceId,
+      });
+    } catch (error) {
+      console.error('Failed to create balance_expired notification:', error);
+    }
   }
 
   // Visit Event Handlers
